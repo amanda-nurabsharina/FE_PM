@@ -139,7 +139,7 @@ export default function LaporanPage() {
         </div>
 
         {/* Bottom bar: Chips Semua | Endorse | Barter | Endorse + Barter */}
-        <div className="flex items-center gap-2 overflow-x-auto pt-1 border-t border-slate-100">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 border-t border-slate-100">
           {[
             { key: 'all', label: 'Semua' },
             { key: 'endorse', label: 'Endorse' },
@@ -168,57 +168,57 @@ export default function LaporanPage() {
       </div>
 
       {/* 3. Grid 4 KPI (2x2) */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
         {/* TOTAL PROYEK */}
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+        <div className="p-3.5 sm:p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col justify-between min-w-0">
+          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1 truncate">
             TOTAL PROYEK
           </span>
-          <span className="text-xl font-black text-slate-900">{report?.total_projects || 0}</span>
-          <span className="text-[11px] text-slate-400 font-medium">Agenda</span>
+          <span className="text-lg sm:text-xl font-black text-slate-900 truncate">{report?.total_projects || 0}</span>
+          <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium">Agenda</span>
         </div>
 
         {/* TOTAL NILAI FEE */}
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+        <div className="p-3.5 sm:p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col justify-between min-w-0">
+          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1 truncate">
             TOTAL NILAI FEE
           </span>
-          <span className="text-xl font-black font-mono text-indigo-600">
+          <span className="text-sm sm:text-xl font-black font-mono text-indigo-600 truncate block">
             {formatIDR(report?.total_fee_revenue || 0)}
           </span>
-          <span className="text-[11px] text-slate-400 font-medium">Termasuk PPN</span>
+          <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate">Termasuk PPN</span>
         </div>
 
         {/* SUDAH LUNAS */}
-        <div className="p-4 bg-white rounded-2xl border border-emerald-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="p-3.5 sm:p-4 bg-white rounded-2xl border border-emerald-200/80 shadow-2xs flex flex-col justify-between min-w-0">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-700 truncate">
               SUDAH LUNAS
             </span>
-            <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center justify-center">
+            <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center justify-center shrink-0">
               {report?.projects.filter((p) => p.status === 'LUNAS').length || 0}
             </span>
           </div>
-          <span className="text-xl font-black font-mono text-emerald-600">
+          <span className="text-sm sm:text-xl font-black font-mono text-emerald-600 truncate block">
             {formatIDR(report?.total_paid || 0)}
           </span>
-          <span className="text-[11px] text-slate-400 font-medium">Dana masuk kas</span>
+          <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate">Dana masuk kas</span>
         </div>
 
         {/* PENDING */}
-        <div className="p-4 bg-white rounded-2xl border border-amber-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="p-3.5 sm:p-4 bg-white rounded-2xl border border-amber-200/80 shadow-2xs flex flex-col justify-between min-w-0">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-amber-700 truncate">
               PENDING
             </span>
-            <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold flex items-center justify-center">
+            <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0">
               {report?.projects.filter((p) => p.status !== 'LUNAS').length || 0}
             </span>
           </div>
-          <span className="text-xl font-black font-mono text-amber-600">
+          <span className="text-sm sm:text-xl font-black font-mono text-amber-600 truncate block">
             {formatIDR(report?.total_unpaid || 0)}
           </span>
-          <span className="text-[11px] text-slate-400 font-medium">Tagihan menunggu</span>
+          <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate">Tagihan menunggu</span>
         </div>
       </div>
 

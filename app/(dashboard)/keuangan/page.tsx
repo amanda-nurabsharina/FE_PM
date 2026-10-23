@@ -126,13 +126,13 @@ export default function KeuanganPage() {
       />
 
       {/* 4. Filter Tipe Transaksi Chips */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
         <button
           onClick={() => {
             setSelectedType('all');
             setPage(1);
           }}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition-all ${
             selectedType === 'all'
               ? 'bg-indigo-600 text-white shadow-xs'
               : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
@@ -146,7 +146,7 @@ export default function KeuanganPage() {
             setSelectedType('income');
             setPage(1);
           }}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition-all ${
             selectedType === 'income'
               ? 'bg-emerald-600 text-white shadow-xs'
               : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
@@ -160,7 +160,7 @@ export default function KeuanganPage() {
             setSelectedType('expense');
             setPage(1);
           }}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition-all ${
             selectedType === 'expense'
               ? 'bg-rose-600 text-white shadow-xs'
               : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'

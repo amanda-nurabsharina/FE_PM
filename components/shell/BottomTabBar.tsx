@@ -52,7 +52,7 @@ export default function BottomTabBar({ unpaidCount = 0 }: BottomTabBarProps) {
   return (
     <nav
       id="floating-dock"
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 px-2 py-1.5 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-xl border border-slate-200/90 shadow-2xl rounded-full flex items-center gap-1 sm:gap-3 transition-all"
+      className="fixed bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.25rem)] max-w-md sm:w-auto px-1 sm:px-4 py-1 sm:py-2 bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-2xl rounded-full flex items-center justify-around sm:justify-center gap-0.5 sm:gap-2 transition-all"
     >
       {tabs.map((tab) => {
         const Icon = tab.icon;
@@ -62,21 +62,21 @@ export default function BottomTabBar({ unpaidCount = 0 }: BottomTabBarProps) {
           <Link
             key={tab.href}
             href={tab.href}
-            className={`relative flex flex-col items-center justify-center min-w-[52px] sm:min-w-[62px] py-1.5 px-1 rounded-2xl transition-all duration-200 ${
+            className={`relative flex flex-col items-center justify-center flex-1 sm:flex-initial min-w-0 sm:min-w-[56px] py-1 sm:py-1.5 px-0.5 sm:px-1.5 rounded-2xl transition-all duration-200 ${
               isActive
                 ? 'text-indigo-600 font-bold'
                 : 'text-slate-500 hover:text-slate-800 font-medium'
             }`}
           >
             <div className="relative">
-              <Icon className={`w-5 h-5 sm:w-5 sm:h-5 transition-transform ${isActive ? 'scale-110 stroke-[2.5]' : 'stroke-[1.75]'}`} />
+              <Icon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${isActive ? 'scale-110 stroke-[2.5]' : 'stroke-[1.75]'}`} />
               {tab.badge && tab.badge > 0 ? (
-                <span className="absolute -top-1.5 -right-2.5 min-w-[17px] h-[17px] px-1 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-xs animate-pulse">
+                <span className="absolute -top-1.5 -right-2.5 min-w-[15px] h-[15px] sm:min-w-[17px] sm:h-[17px] px-0.5 bg-rose-500 text-white text-[9px] sm:text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-xs animate-pulse">
                   {tab.badge}
                 </span>
               ) : null}
             </div>
-            <span className="text-[10px] sm:text-[11px] mt-0.5 tracking-tight">{tab.label}</span>
+            <span className="text-[9px] sm:text-[10px] mt-0.5 tracking-tight truncate max-w-full text-center">{tab.label}</span>
             {isActive && (
               <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full mt-0.5 shadow-xs" />
             )}

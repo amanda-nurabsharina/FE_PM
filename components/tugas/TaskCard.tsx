@@ -98,7 +98,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
       </div>
 
       {/* Bottom Row: Status Badge and Due Date */}
-      <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs">
         <div className="flex items-center gap-2">
           <span className={`w-2 h-2 rounded-full ${statusInfo.dot} animate-pulse`} />
           <span className={`text-[10px] font-black tracking-wider px-2 py-0.5 rounded-md border ${statusInfo.textClass}`}>
@@ -106,7 +106,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
           </span>
         </div>
 
-        <div className="flex items-center gap-2 text-slate-400 font-medium">
+        <div className="flex items-center gap-2 text-slate-400 font-medium text-[11px] sm:text-xs">
           <span>Due: {formatShortDate(task.due_date)}</span>
           <span className="text-indigo-600 font-semibold group-hover:translate-x-0.5 transition-transform">
             Lihat Detail →

@@ -185,7 +185,7 @@ export default function TugasPage() {
       </div>
 
       {/* 4. Baris Chip Filter Status Dinamis */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
         {getStatusChips().map((chip) => {
           const isActive = selectedStatus === chip.value;
           return (

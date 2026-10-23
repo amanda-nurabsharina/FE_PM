@@ -12,11 +12,22 @@ export default function BerandaPage() {
   const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const user = getStoredUser();
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    setUser(getStoredUser());
     fetchDashboard();
+
+    const handleUpdate = () => {
+      setUser(getStoredUser());
+    };
+
+    window.addEventListener('creator_user_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('creator_user_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, []);
 
   const fetchDashboard = async () => {
@@ -42,50 +53,50 @@ export default function BerandaPage() {
   return (
     <div className="space-y-4 animate-in fade-in duration-200">
       {/* 1. Hero Card (Dark Gradient matching Mockup) */}
-      <div className="p-6 sm:p-7 rounded-3xl bg-linear-to-br from-[#1E1B4B] via-[#0F172A] to-[#1E1B4B] text-white shadow-xl border border-indigo-950/60 relative overflow-hidden">
+      <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-linear-to-br from-[#1E1B4B] via-[#0F172A] to-[#1E1B4B] text-white shadow-xl border border-indigo-950/60 relative overflow-hidden">
         <div className="absolute top-0 right-0 -mr-10 -mt-10 w-44 h-44 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none" />
 
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between mb-4 gap-2">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             {user?.avatar_url ? (
               <img
                 src={user.avatar_url}
                 alt={user.name}
-                className="w-12 h-12 rounded-full object-cover border-2 border-indigo-400 shadow-md"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-indigo-400 shadow-md shrink-0"
               />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-indigo-600 text-white font-black text-base flex items-center justify-center border-2 border-indigo-400">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-indigo-600 text-white font-black text-sm sm:text-base flex items-center justify-center border-2 border-indigo-400 shrink-0">
                 {user?.name ? user.name.charAt(0) : 'R'}
               </div>
             )}
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2.5 py-0.5 rounded-full border border-indigo-500/30">
+            <div className="min-w-0">
+              <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full border border-indigo-500/30 truncate inline-block max-w-full">
                 Dashboard Creator & Affiliator
               </span>
-              <h3 className="text-lg font-black text-white mt-1">{user?.name || 'Reza Winata'}</h3>
+              <h3 className="text-base sm:text-lg font-black text-white mt-0.5 truncate">{user?.name || 'Reza Winata'}</h3>
             </div>
           </div>
 
           <Link
             href="/pengaturan"
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 transition-colors"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 transition-colors shrink-0"
           >
             <Sparkles className="w-4 h-4" />
           </Link>
         </div>
 
         {/* 2 Sub-metrics on Hero */}
-        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-indigo-900/40">
-          <div>
-            <span className="text-[11px] text-slate-400 font-semibold block mb-0.5">Total Kas Bersih</span>
-            <span className="text-xl sm:text-2xl font-black font-mono text-emerald-400">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 pt-3 border-t border-indigo-900/40">
+          <div className="min-w-0">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 font-semibold block mb-0.5">Total Kas Bersih</span>
+            <span className="text-base sm:text-2xl font-black font-mono text-emerald-400 truncate block">
               {formatIDR(data.real_cash_balance)}
             </span>
           </div>
 
-          <div>
-            <span className="text-[11px] text-slate-400 font-semibold block mb-0.5">Tugas Aktif</span>
-            <span className="text-xl sm:text-2xl font-black text-white">
+          <div className="min-w-0">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 font-semibold block mb-0.5">Tugas Aktif</span>
+            <span className="text-base sm:text-2xl font-black text-white truncate block">
               {data.active_tasks_count} Agenda
             </span>
           </div>

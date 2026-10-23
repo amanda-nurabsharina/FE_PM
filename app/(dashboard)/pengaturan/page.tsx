@@ -144,11 +144,11 @@ export default function PengaturanPage() {
       </div>
 
       {/* Modern Tabs Navigation */}
-      <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl border border-slate-200 shadow-2xs">
+      <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-x-auto no-scrollbar">
         <button
           type="button"
           onClick={() => setActiveTab('profil')}
-          className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+          className={`flex-1 sm:flex-none px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0 transition-all ${
             activeTab === 'profil'
               ? 'bg-indigo-600 text-white shadow-xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
@@ -163,7 +163,7 @@ export default function PengaturanPage() {
             <button
               type="button"
               onClick={() => setActiveTab('users')}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+              className={`flex-1 sm:flex-none px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0 transition-all ${
                 activeTab === 'users'
                   ? 'bg-indigo-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
@@ -176,7 +176,7 @@ export default function PengaturanPage() {
             <button
               type="button"
               onClick={() => setActiveTab('roles')}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+              className={`flex-1 sm:flex-none px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0 transition-all ${
                 activeTab === 'roles'
                   ? 'bg-indigo-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'

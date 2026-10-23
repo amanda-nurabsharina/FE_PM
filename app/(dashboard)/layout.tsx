@@ -70,7 +70,7 @@ export default function DashboardLayout({
       <Navbar title={getPageTitle(pathname)} />
 
       {/* Main Content Area */}
-      <main className="max-w-4xl w-full mx-auto px-4 py-5 flex-1">
+      <main className="max-w-4xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-5 flex-1 overflow-x-hidden">
         {children}
       </main>
 
