@@ -339,7 +339,7 @@ export default function RoleManagementTab() {
                 <div className="grid grid-cols-2 gap-2">
                   {MENU_OPTIONS.map((opt) => {
                     const isChecked = selectedMenus.includes(opt.slug);
-                    const isSuper = editingRole && editingRole.code === 'SUPER_ADMIN';
+                    const isSuper = Boolean(editingRole && editingRole.code === 'SUPER_ADMIN');
 
                     return (
                       <label
