@@ -29,6 +29,7 @@ export function getStoredUser(): UserProfile | null {
 export function setStoredUser(user: UserProfile) {
   if (typeof window !== 'undefined') {
     localStorage.setItem('creator_user', JSON.stringify(user));
+    window.dispatchEvent(new Event('creator_user_updated'));
   }
 }
 
@@ -203,6 +204,39 @@ export const api = {
   updateSettings: (data: any) => request('/creator/settings', {
     method: 'PUT',
     body: JSON.stringify(data),
+  }),
+
+  changePassword: (data: { old_password?: string; new_password: string }) => request('/creator/change-password', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+
+  // User Management (Super Admin)
+  getUsers: () => request('/creator/users'),
+  createUser: (data: any) => request('/creator/users', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  updateUser: (id: number, data: any) => request(`/creator/users/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  deleteUser: (id: number) => request(`/creator/users/${id}`, {
+    method: 'DELETE',
+  }),
+
+  // Role Management
+  getRoles: () => request('/creator/roles'),
+  createRole: (data: any) => request('/creator/roles', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  updateRole: (id: number, data: any) => request(`/creator/roles/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  deleteRole: (id: number) => request(`/creator/roles/${id}`, {
+    method: 'DELETE',
   }),
 
   // Audit Logs

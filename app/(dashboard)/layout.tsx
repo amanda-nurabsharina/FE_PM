@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Navbar from '@/components/shell/Navbar';
 import BottomTabBar from '@/components/shell/BottomTabBar';
-import { getToken, api } from '@/lib/api-client';
+import { getToken, api, getStoredUser } from '@/lib/api-client';
 
 export default function DashboardLayout({
   children,
@@ -20,10 +20,21 @@ export default function DashboardLayout({
     const token = getToken();
     if (!token) {
       router.replace('/login');
-    } else {
-      setAuthChecked(true);
-      fetchBadgeCount();
+      return;
     }
+
+    const storedUser = getStoredUser();
+    if (storedUser && storedUser.role !== 'SUPER_ADMIN' && storedUser.allowed_menus && storedUser.allowed_menus.length > 0) {
+      const currentSegment = pathname.split('/')[1];
+      if (currentSegment && !storedUser.allowed_menus.includes(currentSegment)) {
+        const fallback = storedUser.allowed_menus[0] || 'beranda';
+        router.replace(`/${fallback}`);
+        return;
+      }
+    }
+
+    setAuthChecked(true);
+    fetchBadgeCount();
   }, [router, pathname]);
 
   const fetchBadgeCount = async () => {

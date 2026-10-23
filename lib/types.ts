@@ -14,6 +14,31 @@ export interface UserProfile {
   bank_account_number?: string;
   bank_account_holder?: string;
   role?: string;
+  role_name?: string;
+  allowed_menus?: string[];
+  owner_id?: number | null;
+  created_at?: string;
+}
+
+export interface RoleItem {
+  id: number;
+  code: string;
+  name: string;
+  description: string;
+  menus: string[];
+  is_system?: boolean;
+}
+
+export interface UserItem {
+  id: number;
+  name: string;
+  email: string;
+  avatar_url?: string;
+  role: string;
+  role_name?: string;
+  allowed_menus: string[];
+  owner_id?: number | null;
+  created_at: string;
 }
 
 export interface ChecklistItem {

@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutGrid, CheckSquare, BarChart3, FileText, Wallet, Settings } from 'lucide-react';
+import { getStoredUser } from '@/lib/api-client';
+import { UserProfile } from '@/lib/types';
 
 interface BottomTabBarProps {
   unpaidCount?: number;
@@ -11,15 +13,41 @@ interface BottomTabBarProps {
 
 export default function BottomTabBar({ unpaidCount = 0 }: BottomTabBarProps) {
   const pathname = usePathname();
+  const [user, setUser] = useState<UserProfile | null>(null);
 
-  const tabs = [
-    { label: 'Beranda', href: '/beranda', icon: LayoutGrid },
-    { label: 'Tugas', href: '/tugas', icon: CheckSquare },
-    { label: 'Laporan', href: '/laporan', icon: BarChart3 },
-    { label: 'Invoice', href: '/invoice', icon: FileText, badge: unpaidCount },
-    { label: 'Keuangan', href: '/keuangan', icon: Wallet },
-    { label: 'Setting', href: '/pengaturan', icon: Settings },
+  useEffect(() => {
+    setUser(getStoredUser());
+
+    const handleUpdate = () => {
+      setUser(getStoredUser());
+    };
+
+    window.addEventListener('creator_user_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('creator_user_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
+
+  const allTabs = [
+    { slug: 'beranda', label: 'Beranda', href: '/beranda', icon: LayoutGrid },
+    { slug: 'tugas', label: 'Tugas', href: '/tugas', icon: CheckSquare },
+    { slug: 'laporan', label: 'Laporan', href: '/laporan', icon: BarChart3 },
+    { slug: 'invoice', label: 'Invoice', href: '/invoice', icon: FileText, badge: unpaidCount },
+    { slug: 'keuangan', label: 'Keuangan', href: '/keuangan', icon: Wallet },
+    { slug: 'pengaturan', label: 'Setting', href: '/pengaturan', icon: Settings },
   ];
+
+  // Super Admin has all menus; others filter by allowed_menus
+  const tabs = allTabs.filter((tab) => {
+    if (!user) return true; // Default show all during SSR/initial
+    if (user.role === 'SUPER_ADMIN') return true;
+    if (user.allowed_menus && Array.isArray(user.allowed_menus)) {
+      return user.allowed_menus.includes(tab.slug);
+    }
+    return true;
+  });
 
   return (
     <nav

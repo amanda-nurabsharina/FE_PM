@@ -1,21 +1,39 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LogOut } from 'lucide-react';
 import { api, getStoredUser } from '@/lib/api-client';
+import { UserProfile } from '@/lib/types';
 
 interface NavbarProps {
   title: string;
 }
 
 export default function Navbar({ title }: NavbarProps) {
-  const user = getStoredUser();
+  const [user, setUser] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    setUser(getStoredUser());
+
+    const handleUpdate = () => {
+      setUser(getStoredUser());
+    };
+
+    window.addEventListener('creator_user_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('creator_user_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
 
   const handleLogout = () => {
     if (confirm('Apakah Anda yakin ingin keluar dari CreatorTask?')) {
       api.logout();
     }
   };
+
+  const roleLabel = user?.role_name || (user?.role === 'SUPER_ADMIN' ? 'Super Admin' : user?.role || 'Staff');
 
   return (
     <header className="sticky top-0 z-30 w-full bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-xs">
@@ -37,22 +55,27 @@ export default function Navbar({ title }: NavbarProps) {
         </div>
 
         {/* Right: User Profile & Logout */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 pl-2 pr-3 py-1 bg-slate-50 hover:bg-slate-100 rounded-full border border-slate-200 transition-colors">
             {user?.avatar_url ? (
               <img
                 src={user.avatar_url}
-                alt={user.name || 'Owner'}
+                alt={user.name || 'User'}
                 className="w-7 h-7 rounded-full object-cover border border-indigo-200"
               />
             ) : (
               <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs">
-                {user?.name ? user.name.charAt(0) : 'R'}
+                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
               </div>
             )}
-            <span className="text-xs font-semibold text-slate-700 max-w-[120px] truncate hidden md:inline">
-              {user?.name || 'Reza Winata'}
-            </span>
+            <div className="flex flex-col text-left">
+              <span className="text-xs font-semibold text-slate-700 max-w-[110px] truncate hidden md:inline leading-tight">
+                {user?.name || 'Pengguna'}
+              </span>
+              <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-wider hidden md:inline leading-none">
+                {roleLabel}
+              </span>
+            </div>
           </div>
 
           <button
