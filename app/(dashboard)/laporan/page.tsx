@@ -13,8 +13,8 @@ import ReportSheetTwo from '@/components/pdf/ReportSheetTwo';
 
 export default function LaporanPage() {
   const [report, setReport] = useState<ReportData | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<number>(10);
-  const [selectedYear, setSelectedYear] = useState<number>(2026);
+  const [selectedMonth, setSelectedMonth] = useState<number>(0);
+  const [selectedYear, setSelectedYear] = useState<number>(0);
   const [coopType, setCoopType] = useState<string>('all');
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState(true);
@@ -43,7 +43,13 @@ export default function LaporanPage() {
     { value: 12, label: 'Desember' },
   ];
 
-  const years = [2025, 2026, 2027];
+  const years = [
+    { value: 0, label: 'Semua Tahun' },
+    { value: 2024, label: '2024' },
+    { value: 2025, label: '2025' },
+    { value: 2026, label: '2026' },
+    { value: 2027, label: '2027' },
+  ];
 
   useEffect(() => {
     loadReport();
@@ -71,7 +77,8 @@ export default function LaporanPage() {
     window.print();
   };
 
-  const rowsWithProof = report ? report.projects.filter((p) => p.payment_proof_url) : [];
+  const projects = report?.projects || [];
+  const rowsWithProof = projects.filter((p) => p.payment_proof_url);
 
   return (
     <div className="space-y-4 animate-in fade-in duration-200">
@@ -82,7 +89,7 @@ export default function LaporanPage() {
             <span className="text-[10px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-md border border-indigo-500/30">
               Laporan & Rekapitulasi
             </span>
-            <span className="text-xs text-slate-400 font-medium">• {report?.period_label || 'Oktober 2026'}</span>
+            <span className="text-xs text-slate-400 font-medium">• {report?.period_label || 'Semua Periode'}</span>
           </div>
           <h2 className="text-xl font-black text-white tracking-tight">Rekapitulasi Project & Keuangan</h2>
           <p className="text-xs text-slate-400 mt-0.5">Ringkasan fee endorse/barter & ekspor PDF resmi.</p>
@@ -126,8 +133,8 @@ export default function LaporanPage() {
               className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-hidden"
             >
               {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
+                <option key={y.value} value={y.value}>
+                  {y.label}
                 </option>
               ))}
             </select>
@@ -196,7 +203,7 @@ export default function LaporanPage() {
               SUDAH LUNAS
             </span>
             <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center justify-center shrink-0">
-              {report?.projects.filter((p) => p.status === 'LUNAS').length || 0}
+              {projects.filter((p) => p.status === 'LUNAS').length}
             </span>
           </div>
           <span className="text-sm sm:text-xl font-black font-mono text-emerald-600 truncate block">
@@ -212,7 +219,7 @@ export default function LaporanPage() {
               PENDING
             </span>
             <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0">
-              {report?.projects.filter((p) => p.status !== 'LUNAS').length || 0}
+              {projects.filter((p) => p.status !== 'LUNAS').length}
             </span>
           </div>
           <span className="text-sm sm:text-xl font-black font-mono text-amber-600 truncate block">
@@ -228,16 +235,16 @@ export default function LaporanPage() {
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
             DAFTAR PROYEK & INVOICE
           </h4>
-          <span className="text-xs text-slate-400 font-semibold">{report?.pagination.total_items || 0} Rincian</span>
+          <span className="text-xs text-slate-400 font-semibold">{report?.pagination?.total_items || 0} Rincian</span>
         </div>
 
         {loading ? (
           <div className="py-12 text-center text-slate-400 text-xs">Memuat rincian laporan...</div>
-        ) : !report || report.projects.length === 0 ? (
+        ) : projects.length === 0 ? (
           <div className="py-12 text-center text-slate-400 text-xs">Tidak ada data proyek pada filter ini</div>
         ) : (
           <div className="space-y-3">
-            {report.projects.map((proj) => {
+            {projects.map((proj) => {
               const isLunas = proj.status === 'LUNAS';
 
               return (
@@ -294,7 +301,9 @@ export default function LaporanPage() {
             })}
 
             {/* Pagination 4-item */}
-            <Pagination meta={report.pagination} onPageChange={(p) => setPage(p)} />
+            {report?.pagination && (
+              <Pagination meta={report.pagination} onPageChange={(p) => setPage(p)} />
+            )}
           </div>
         )}
       </div>
@@ -345,7 +354,7 @@ export default function LaporanPage() {
                 <h3 className="font-bold text-slate-900 text-sm sm:text-base">
                   Pratinjau Dokumen Laporan A4
                 </h3>
-                <p className="text-xs text-slate-500">Periode: {report.period_label}</p>
+                <p className="text-xs text-slate-500">Periode: {report.period_label || 'Semua Periode'}</p>
               </div>
 
               <div className="flex items-center gap-3">
@@ -380,13 +389,13 @@ export default function LaporanPage() {
               <div id="printable-report-document" className="bg-white shadow-xl rounded-sm">
                 <ReportSheetOne
                   owner={user}
-                  periodLabel={report.period_label}
+                  periodLabel={report.period_label || 'Semua Periode'}
                   coopFilter={coopType}
-                  totalProjects={report.total_projects}
-                  totalRevenue={report.total_fee_revenue}
-                  totalPaid={report.total_paid}
-                  totalUnpaid={report.total_unpaid}
-                  rows={report.projects}
+                  totalProjects={report.total_projects || 0}
+                  totalRevenue={report.total_fee_revenue || 0}
+                  totalPaid={report.total_paid || 0}
+                  totalUnpaid={report.total_unpaid || 0}
+                  rows={projects}
                 />
 
                 {includeAttachments && rowsWithProof.length > 0 && (

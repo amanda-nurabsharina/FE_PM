@@ -10,7 +10,8 @@ interface ReportSheetTwoProps {
 }
 
 export default function ReportSheetTwo({ periodLabel, rowsWithProof }: ReportSheetTwoProps) {
-  if (rowsWithProof.length === 0) return null;
+  const safeProof = rowsWithProof || [];
+  if (safeProof.length === 0) return null;
 
   return (
     <div
@@ -31,7 +32,7 @@ export default function ReportSheetTwo({ periodLabel, rowsWithProof }: ReportShe
 
           <div className="text-right">
             <span className="inline-block px-3 py-1 bg-slate-900 text-white font-bold text-xs rounded-md">
-              Total {rowsWithProof.length} Bukti Transfer
+              Total {safeProof.length} Bukti Transfer
             </span>
             <p className="text-[10px] text-slate-400 mt-1 font-mono">LEMBAR 2 (LAMPIRAN)</p>
           </div>
@@ -39,7 +40,7 @@ export default function ReportSheetTwo({ periodLabel, rowsWithProof }: ReportShe
 
         {/* 2-Column Grid for Proof Cards (SRS 6.3) */}
         <div className="grid grid-cols-2 gap-4">
-          {rowsWithProof.map((item) => (
+          {safeProof.map((item) => (
             <div
               key={item.task_id}
               className="avoid-break p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-col gap-2.5"

@@ -31,8 +31,9 @@ export default function ReportSheetOne({
     year: 'numeric',
   });
 
-  const paidCount = rows.filter((r) => r.status === 'LUNAS').length;
-  const pendingCount = rows.filter((r) => r.status !== 'LUNAS').length;
+  const safeRows = rows || [];
+  const paidCount = safeRows.filter((r) => r.status === 'LUNAS').length;
+  const pendingCount = safeRows.filter((r) => r.status !== 'LUNAS').length;
 
   return (
     <div className="bg-white text-slate-900 w-full max-w-[210mm] mx-auto p-8 sm:p-12 font-sans text-xs flex flex-col justify-between" style={{ minHeight: '297mm' }}>
@@ -117,33 +118,41 @@ export default function ReportSheetOne({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-xs">
-              {rows.map((row, idx) => (
-                <tr key={row.task_id} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'}>
-                  <td className="py-2.5 px-2 text-center font-bold text-slate-500">{row.index}</td>
-                  <td className="py-2.5 px-3 font-semibold text-slate-800 break-words">{row.project_brand}</td>
-                  <td className="py-2.5 px-2 text-center">
-                    <span className="uppercase text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-700">
-                      {row.type}
-                    </span>
+              {safeRows.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-6 text-center text-slate-400">
+                    Tidak ada data proyek pada periode ini
                   </td>
-                  <td className="py-2.5 px-2 font-mono text-[10px] text-slate-600">{row.invoice_number}</td>
-                  <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
-                    {formatIDR(row.value)}
-                  </td>
-                  <td className="py-2.5 px-2 text-center">
-                    <span
-                      className={`text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase ${
-                        row.status === 'LUNAS'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-amber-100 text-amber-800'
-                      }`}
-                    >
-                      {row.status}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-2 text-center font-bold text-indigo-700">{row.attachment_label}</td>
                 </tr>
-              ))}
+              ) : (
+                safeRows.map((row, idx) => (
+                  <tr key={row.task_id} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'}>
+                    <td className="py-2.5 px-2 text-center font-bold text-slate-500">{row.index}</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-800 break-words">{row.project_brand}</td>
+                    <td className="py-2.5 px-2 text-center">
+                      <span className="uppercase text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                        {row.type}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-2 font-mono text-[10px] text-slate-600">{row.invoice_number}</td>
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
+                      {formatIDR(row.value)}
+                    </td>
+                    <td className="py-2.5 px-2 text-center">
+                      <span
+                        className={`text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase ${
+                          row.status === 'LUNAS'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {row.status}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-2 text-center font-bold text-indigo-700">{row.attachment_label}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
             <tfoot>
               <tr className="bg-slate-100 font-bold border-t-2 border-slate-300">
