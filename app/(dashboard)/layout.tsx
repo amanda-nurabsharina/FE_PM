@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Navbar from '@/components/shell/Navbar';
 import BottomTabBar from '@/components/shell/BottomTabBar';
-import { getToken, api, getStoredUser } from '@/lib/api-client';
+import { getToken, removeToken, api, getStoredUser } from '@/lib/api-client';
 
 export default function DashboardLayout({
   children,
@@ -24,7 +24,14 @@ export default function DashboardLayout({
     }
 
     const storedUser = getStoredUser();
-    if (storedUser && storedUser.role !== 'SUPER_ADMIN' && storedUser.allowed_menus && storedUser.allowed_menus.length > 0) {
+    // Super Admin is platform master only and cannot access workspace apps
+    if (storedUser?.role === 'SUPER_ADMIN') {
+      removeToken();
+      router.replace('/login');
+      return;
+    }
+
+    if (storedUser && storedUser.role !== 'OWNER' && !storedUser.is_owner && storedUser.allowed_menus && storedUser.allowed_menus.length > 0) {
       const currentSegment = pathname.split('/')[1];
       if (currentSegment && !storedUser.allowed_menus.includes(currentSegment)) {
         const fallback = storedUser.allowed_menus[0] || 'beranda';

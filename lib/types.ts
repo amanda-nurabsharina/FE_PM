@@ -1,5 +1,46 @@
+export interface Tenant {
+  id: number;
+  name: string;
+  slug: string;
+  status: 'active' | 'suspended';
+  logo_url?: string;
+  phone?: string;
+  company_address?: string;
+  npwp?: string;
+  tax_rate: number;
+  bank_name?: string;
+  bank_account_number?: string;
+  bank_account_holder?: string;
+  owner_id?: number;
+  owner_name?: string;
+  owner_email?: string;
+  total_users?: number;
+  total_tasks?: number;
+  created_at: string;
+}
+
+export interface CreateTenantPayload {
+  name: string;
+  slug: string;
+  owner_name: string;
+  owner_email: string;
+  owner_password: string;
+  phone?: string;
+  company_address?: string;
+  npwp?: string;
+  tax_rate?: number;
+  bank_name?: string;
+  bank_account_number?: string;
+  bank_account_holder?: string;
+}
+
 export interface UserProfile {
   id: number;
+  tenant_id?: number;
+  tenant_slug?: string;
+  tenant_name?: string;
+  is_owner?: boolean;
+  tenant?: Tenant;
   name: string;
   email: string;
   avatar_url?: string;

@@ -2,49 +2,54 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogIn, UserCheck, ShieldCheck } from 'lucide-react';
-import { api, getToken } from '@/lib/api-client';
-import { UserProfile } from '@/lib/types';
+import { LogIn } from 'lucide-react';
+import { api, getToken, getStoredUser, removeToken } from '@/lib/api-client';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('reza@studio.id');
-  const [password, setPassword] = useState('password123');
-  const [quickUsers, setQuickUsers] = useState<UserProfile[]>([]);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [tenantSlug, setTenantSlug] = useState('');
+  const [showTenantInput, setShowTenantInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (getToken()) {
+    const token = getToken();
+    const user = getStoredUser();
+    if (token && user && user.role !== 'SUPER_ADMIN') {
       router.replace('/beranda');
     } else {
-      api.getQuickUsers().then(setQuickUsers).catch(console.error);
+      if (user?.role === 'SUPER_ADMIN') {
+        removeToken();
+      }
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const t = params.get('tenant');
+        if (t) {
+          setTenantSlug(t);
+          setShowTenantInput(true);
+        }
+      }
     }
   }, [router]);
 
   const handleManualLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (email.toLowerCase().includes('superadmin')) {
+      setError('Akun Super Admin adalah akun pengelola platform SaaS. Silakan login melalui portal Master Admin (/admin/login).');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await api.login(email, password);
+      await api.login(email, password, tenantSlug);
       router.replace('/beranda');
     } catch (err: any) {
       setError(err.message || 'Login gagal');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleQuickLogin = async (userEmail: string) => {
-    setError('');
-    setLoading(true);
-    try {
-      await api.quickLogin(userEmail);
-      router.replace('/beranda');
-    } catch (err: any) {
-      setError(err.message || 'Quick login gagal');
     } finally {
       setLoading(false);
     }
@@ -70,55 +75,55 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Quick Profile Switcher (SRS 5.1 FR-LGN-02) */}
-        {quickUsers.length > 0 && (
-          <div className="space-y-2.5">
-            <label className="text-xs font-bold text-slate-700 block">
-              Pilih Akun Cepat (Quick Login Demo):
-            </label>
-            <div className="space-y-2">
-              {quickUsers.map((u) => (
-                <div
-                  key={u.id}
-                  onClick={() => handleQuickLogin(u.email)}
-                  className="p-3 bg-slate-50 hover:bg-indigo-50/60 border border-slate-200 hover:border-indigo-300 rounded-2xl flex items-center justify-between cursor-pointer transition-all group"
-                >
-                  <div className="flex items-center gap-3">
-                    {u.avatar_url ? (
-                      <img
-                        src={u.avatar_url}
-                        alt={u.name}
-                        className="w-10 h-10 rounded-full object-cover border border-slate-200"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center">
-                        {u.name.charAt(0)}
-                      </div>
-                    )}
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                        {u.name}
-                      </h4>
-                      <p className="text-[11px] text-slate-500">{u.company || u.email}</p>
-                    </div>
-                  </div>
-                  <UserCheck className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="relative flex py-1 items-center">
-          <div className="grow border-t border-slate-200"></div>
-          <span className="shrink mx-4 text-slate-400 text-[11px] font-semibold uppercase tracking-wider">
-            atau login manual
-          </span>
-          <div className="grow border-t border-slate-200"></div>
-        </div>
-
-        {/* Manual Login Form */}
+        {/* Login Form */}
         <form onSubmit={handleManualLogin} className="space-y-3.5">
+          {tenantSlug ? (
+            <div className="p-2.5 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between text-xs text-indigo-900 font-semibold">
+              <span className="flex items-center gap-1.5 truncate">
+                <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
+                Workspace: <span className="font-mono font-bold">{tenantSlug}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setTenantSlug('')}
+                className="text-slate-400 hover:text-slate-700 text-xs px-1"
+                title="Hapus slug workspace"
+              >
+                ✕
+              </button>
+            </div>
+          ) : showTenantInput ? (
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-slate-700">Workspace / Slug Tenant (Opsional)</label>
+                <button
+                  type="button"
+                  onClick={() => setShowTenantInput(false)}
+                  className="text-[10px] text-slate-400 hover:text-slate-600"
+                >
+                  Sembunyikan
+                </button>
+              </div>
+              <input
+                type="text"
+                value={tenantSlug}
+                onChange={(e) => setTenantSlug(e.target.value.toLowerCase().trim())}
+                placeholder="e.g. reza-studio"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono text-indigo-700 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              />
+            </div>
+          ) : (
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setShowTenantInput(true)}
+                className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+              >
+                + Masuk ke workspace/tenant tertentu
+              </button>
+            </div>
+          )}
+
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">Email Pemilik / Studio *</label>
             <input

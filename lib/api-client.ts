@@ -2,6 +2,7 @@ import { UserProfile } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
 
+// --- CREATOR TASK WORKSPACE AUTH STORAGE ---
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('creator_token');
@@ -33,6 +34,39 @@ export function setStoredUser(user: UserProfile) {
   }
 }
 
+// --- MASTER ADMIN SAAS PLATFORM AUTH STORAGE (COMPLETELY ISOLATED) ---
+export function getAdminToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('platform_admin_token');
+}
+
+export function setAdminToken(token: string) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('platform_admin_token', token);
+  }
+}
+
+export function removeAdminToken() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('platform_admin_token');
+    localStorage.removeItem('platform_admin_user');
+  }
+}
+
+export function getAdminStoredUser(): UserProfile | null {
+  if (typeof window === 'undefined') return null;
+  const user = localStorage.getItem('platform_admin_user');
+  return user ? JSON.parse(user) : null;
+}
+
+export function setAdminStoredUser(user: UserProfile) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('platform_admin_user', JSON.stringify(user));
+    window.dispatchEvent(new Event('platform_admin_user_updated'));
+  }
+}
+
+// Request helper for CreatorTask workspace
 async function request(endpoint: string, options: RequestInit = {}) {
   const token = getToken();
   const headers: HeadersInit = {
@@ -59,16 +93,46 @@ async function request(endpoint: string, options: RequestInit = {}) {
   return json.data;
 }
 
+// Request helper for Master Admin Platform (uses isolated admin token)
+async function adminRequest(endpoint: string, options: RequestInit = {}) {
+  const token = getAdminToken();
+  const headers: HeadersInit = {
+    ...options.headers,
+  };
+
+  if (token) {
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+  }
+
+  if (!(options.body instanceof FormData)) {
+    (headers as Record<string, string>)['Content-Type'] = 'application/json';
+  }
+
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(json.message || 'Terjadi kesalahan sistem');
+  }
+  return json.data;
+}
+
 export const api = {
-  // Auth
-  login: async (email: string, password: string) => {
+  // Creator Workspace Auth (Scoped to creator_token)
+  login: async (email: string, password: string, tenant_slug?: string) => {
     const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, tenant_slug: tenant_slug || undefined }),
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || 'Login gagal');
+    if (json.data?.user?.role === 'SUPER_ADMIN') {
+      throw new Error('Akun Super Admin adalah akun pengelola SaaS. Silakan login melalui portal Master Admin (/admin/login).');
+    }
     setToken(json.data.token);
     setStoredUser(json.data.user);
     return json.data;
@@ -82,9 +146,33 @@ export const api = {
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || 'Quick login gagal');
+    if (json.data?.user?.role === 'SUPER_ADMIN') {
+      throw new Error('Akun Super Admin tidak dapat mengakses ruang kerja CreatorTask.');
+    }
     setToken(json.data.token);
     setStoredUser(json.data.user);
     return json.data;
+  },
+
+  // Master Admin Auth (Scoped to platform_admin_token - 100% ISOLATED)
+  adminLogin: async (email: string, password: string) => {
+    const res = await fetch(`${API_BASE_URL}/platform/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || 'Admin login gagal');
+    if (json.data?.user?.role !== 'SUPER_ADMIN') {
+      throw new Error('Akses ditolak: Hanya Master Platform Administrator yang dapat login ke portal ini.');
+    }
+    setAdminToken(json.data.token);
+    setAdminStoredUser(json.data.user);
+    return json.data;
+  },
+
+  adminLogout: () => {
+    removeAdminToken();
   },
 
   getQuickUsers: async () => {
@@ -258,4 +346,20 @@ export const api = {
       body: formData,
     });
   },
+
+  // Platform & Multi-Tenant Management (Authenticated with platform_admin_token)
+  getTenants: () => adminRequest('/platform/tenants'),
+  getTenantById: (id: number) => adminRequest(`/platform/tenants/${id}`),
+  createTenant: (data: any) => adminRequest('/platform/tenants', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  updateTenantStatus: (id: number, status: 'active' | 'suspended') => adminRequest(`/platform/tenants/${id}/status`, {
+    method: 'PUT',
+    body: JSON.stringify({ status }),
+  }),
+  resetTenantOwnerPassword: (id: number, new_password: string) => adminRequest(`/platform/tenants/${id}/reset-password`, {
+    method: 'POST',
+    body: JSON.stringify({ new_password }),
+  }),
 };

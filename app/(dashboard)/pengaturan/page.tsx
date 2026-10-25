@@ -79,7 +79,7 @@ export default function PengaturanPage() {
     }
   };
 
-  const isSuperAdmin = currentUser?.role === 'SUPER_ADMIN';
+  const canManageUsers = currentUser?.is_owner || currentUser?.role === 'OWNER' || currentUser?.role === 'SUPER_ADMIN';
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,7 +158,7 @@ export default function PengaturanPage() {
           <span>Profil Studio</span>
         </button>
 
-        {isSuperAdmin && (
+        {canManageUsers && (
           <>
             <button
               type="button"
@@ -284,7 +284,7 @@ export default function PengaturanPage() {
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-indigo-600" />
                     <span className="font-bold">
-                      {currentUser?.role_name || (isSuperAdmin ? 'Super Admin (Akses Penuh)' : currentUser?.role)}
+                      {currentUser?.role_name || (canManageUsers ? 'Owner Studio (Akses Penuh)' : currentUser?.role || 'Staff')}
                     </span>
                   </div>
                   <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
@@ -449,10 +449,10 @@ export default function PengaturanPage() {
       )}
 
       {/* TAB 2: KELOLA PENGGUNA */}
-      {activeTab === 'users' && isSuperAdmin && <UserManagementTab />}
+      {activeTab === 'users' && canManageUsers && <UserManagementTab />}
 
       {/* TAB 3: ROLE & HAK AKSES */}
-      {activeTab === 'roles' && isSuperAdmin && <RoleManagementTab />}
+      {activeTab === 'roles' && canManageUsers && <RoleManagementTab />}
 
       {/* Change Password Modal */}
       <ChangePasswordModal

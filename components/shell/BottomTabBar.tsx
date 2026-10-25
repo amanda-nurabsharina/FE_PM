@@ -39,10 +39,10 @@ export default function BottomTabBar({ unpaidCount = 0 }: BottomTabBarProps) {
     { slug: 'pengaturan', label: 'Setting', href: '/pengaturan', icon: Settings },
   ];
 
-  // Super Admin has all menus; others filter by allowed_menus
+  // Super Admin & Studio Owner have all menus; others filter by allowed_menus
   const tabs = allTabs.filter((tab) => {
     if (!user) return true; // Default show all during SSR/initial
-    if (user.role === 'SUPER_ADMIN') return true;
+    if (user.role === 'SUPER_ADMIN' || user.role === 'OWNER' || user.is_owner) return true;
     if (user.allowed_menus && Array.isArray(user.allowed_menus)) {
       return user.allowed_menus.includes(tab.slug);
     }

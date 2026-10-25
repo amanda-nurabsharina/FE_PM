@@ -38,14 +38,18 @@ export default function Navbar({ title }: NavbarProps) {
   return (
     <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
       <div className="max-w-4xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Left: Branding */}
+        {/* Left: Branding & Active Tenant */}
         <div className="flex items-center gap-2.5 shrink-0">
           <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-sm sm:text-base shadow-md shadow-indigo-200 shrink-0">
             CT
           </div>
           <div className="hidden md:block">
-            <h1 className="font-bold text-slate-900 leading-tight text-sm">CreatorTask</h1>
-            <p className="text-[10px] text-slate-500 font-medium">Workspace</p>
+            <h1 className="font-bold text-slate-900 leading-tight text-sm">
+              {user?.tenant_name || user?.company || 'CreatorTask'}
+            </h1>
+            <p className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">
+              {user?.tenant_slug ? `Workspace: ${user.tenant_slug}` : 'Multi-Tenant SaaS'}
+            </p>
           </div>
         </div>
 
