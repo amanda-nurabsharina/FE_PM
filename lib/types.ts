@@ -7,6 +7,7 @@ export interface Tenant {
   phone?: string;
   company_address?: string;
   npwp?: string;
+  no_ktp?: string;
   tax_rate: number;
   bank_name?: string;
   bank_account_number?: string;
@@ -28,6 +29,7 @@ export interface CreateTenantPayload {
   phone?: string;
   company_address?: string;
   npwp?: string;
+  no_ktp?: string;
   tax_rate?: number;
   bank_name?: string;
   bank_account_number?: string;
@@ -48,6 +50,7 @@ export interface UserProfile {
   phone?: string;
   company_address?: string;
   npwp?: string;
+  no_ktp?: string;
   tax_rate: number;
   logo_url?: string;
   signature_url?: string;

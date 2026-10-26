@@ -65,9 +65,12 @@ export default function ReportSheetOne({
             <span className="inline-block text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-slate-900 text-white rounded-md">
               Periode: {periodLabel}
             </span>
-            <p className="text-[10px] text-slate-600 font-medium">Filter: {coopFilter.toUpperCase()}</p>
-            {owner.npwp && (
-              <p className="text-[10px] text-slate-500 font-mono">NPWP: {owner.npwp}</p>
+            {(owner.npwp || owner.no_ktp) && (
+              <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-500 font-mono mt-0.5 justify-end">
+                {owner.npwp && <span>NPWP: {owner.npwp}</span>}
+                {owner.npwp && owner.no_ktp && <span>•</span>}
+                {owner.no_ktp && <span>NIK: {owner.no_ktp}</span>}
+              </div>
             )}
           </div>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Upload, Trash2 } from 'lucide-react';
+import { Upload, Trash2, Check, Image as ImageIcon } from 'lucide-react';
 import { api } from '@/lib/api-client';
 
 interface LogoUploaderProps {
@@ -37,53 +37,82 @@ export default function LogoUploader({
     : 'CT';
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <label className="text-xs font-bold text-slate-700">Logo Studio Resmi (Kop Dokumen)</label>
-        {logoUrl && (
-          <button
-            type="button"
-            onClick={() => onChange('')}
-            className="text-[11px] font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1"
-          >
-            <Trash2 className="w-3.5 h-3.5" /> Hapus Logo
-          </button>
+    <div className="space-y-4">
+      {/* Header matching screenshot */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+        <div className="flex items-center gap-2">
+          <ImageIcon className="w-4 h-4 text-indigo-600 shrink-0" />
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+            LOGO USAHA / CREATOR STUDIO (KOP KIRI ATAS INVOICE)
+          </h3>
+        </div>
+        {logoUrl ? (
+          <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full flex items-center gap-1 self-start sm:self-auto">
+            <Check className="w-3 h-3 text-emerald-600" /> Logo Aktif
+          </span>
+        ) : (
+          <span className="text-[11px] font-medium text-slate-400 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full self-start sm:self-auto">
+            Belum Diatur
+          </span>
         )}
       </div>
 
-      <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-        {/* Preview / Initials Fallback (BR-18) */}
-        {logoUrl ? (
-          <img
-            src={logoUrl}
-            alt="Logo Studio"
-            className="w-16 h-16 rounded-xl object-contain bg-white border border-slate-200 shadow-2xs"
-          />
-        ) : (
-          <div className="w-16 h-16 rounded-xl bg-indigo-600 text-white font-black text-xl flex items-center justify-center shadow-md shadow-indigo-200">
-            {initials}
-          </div>
-        )}
+      <p className="text-xs text-slate-500 font-medium">
+        Logo ini akan dicantumkan secara otomatis pada sudut <strong className="text-slate-700">kiri atas</strong> kop dokumen Invoice Tagihan dan format cetak PDF resmi.
+      </p>
 
-        <div className="flex-1">
-          <div className="relative inline-block">
-            <input
-              type="file"
-              accept="image/png, image/jpeg, image/webp"
-              onChange={handleUpload}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      {/* Main Container */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-1">
+        {/* Logo Preview Box */}
+        <div className="w-36 h-20 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden">
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="Logo Studio"
+              className="max-h-full max-w-full object-contain"
             />
-            <button
-              type="button"
-              className="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl shadow-2xs flex items-center gap-1.5 transition-colors"
-            >
-              <Upload className="w-4 h-4 text-slate-500" />
-              {uploading ? 'Mengunggah...' : 'Pilih Logo Baru'}
-            </button>
+          ) : (
+            <div className="w-12 h-12 rounded-xl bg-indigo-600 text-white font-black text-lg flex items-center justify-center shadow-xs">
+              {initials}
+            </div>
+          )}
+        </div>
+
+        {/* Action Controls */}
+        <div className="flex-1 space-y-2">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="relative inline-block">
+              <input
+                type="file"
+                accept="image/png, image/jpeg, image/webp, image/svg+xml"
+                onChange={handleUpload}
+                disabled={uploading}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+              />
+              <button
+                type="button"
+                disabled={uploading}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs shadow-indigo-200 flex items-center gap-2 transition-all disabled:opacity-50"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                {uploading ? 'Mengunggah...' : logoUrl ? 'Ganti Logo Brand' : 'Unggah Logo Brand'}
+              </button>
+            </div>
+
+            {logoUrl && (
+              <button
+                type="button"
+                onClick={() => onChange('')}
+                className="px-3.5 py-2 bg-white hover:bg-rose-50 border border-rose-200 text-rose-600 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Hapus Logo
+              </button>
+            )}
           </div>
-          <span className="block text-[11px] text-slate-400 mt-1.5 font-medium">
-            Format PNG, JPG, WEBP (Maksimal 2 MB). Bila kosong, dokumen cetak memakai inisial "{initials}".
-          </span>
+
+          <p className="text-[11px] text-slate-400 font-medium">
+            Direkomendasikan format PNG transparan atau SVG dengan rasio horizontal (2:1 atau 3:1).
+          </p>
         </div>
       </div>
     </div>

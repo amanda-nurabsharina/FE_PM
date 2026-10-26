@@ -38,9 +38,12 @@ export default function InvoiceSheetA4({ invoice, owner }: InvoiceSheetA4Props) 
                 {owner.company || 'Creator Studio'}
               </h2>
               <p className="text-slate-600 font-medium text-[11px] mt-0.5">{owner.name} • {owner.phone || '-'}</p>
-              <p className="text-slate-500 text-[10px] max-w-sm mt-0.5">{owner.company_address || '-'}</p>
-              {owner.npwp && (
-                <p className="text-slate-500 text-[10px] font-mono mt-0.5">NPWP: {owner.npwp}</p>
+              {(owner.npwp || owner.no_ktp) && (
+                <div className="flex items-center gap-2 flex-wrap text-slate-500 text-[10px] font-mono mt-0.5">
+                  {owner.npwp && <span>NPWP: {owner.npwp}</span>}
+                  {owner.npwp && owner.no_ktp && <span>•</span>}
+                  {owner.no_ktp && <span>NIK/KTP: {owner.no_ktp}</span>}
+                </div>
               )}
             </div>
           </div>

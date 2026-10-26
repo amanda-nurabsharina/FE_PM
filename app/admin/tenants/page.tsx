@@ -52,6 +52,7 @@ export default function MasterAdminTenantsPage() {
     phone: '',
     company_address: '',
     npwp: '',
+    no_ktp: '',
     tax_rate: 11,
     bank_name: 'BCA',
     bank_account_number: '',
@@ -132,6 +133,7 @@ export default function MasterAdminTenantsPage() {
         phone: '',
         company_address: '',
         npwp: '',
+        no_ktp: '',
         tax_rate: 11,
         bank_name: 'BCA',
         bank_account_number: '',
@@ -422,6 +424,9 @@ export default function MasterAdminTenantsPage() {
                       {t.npwp && (
                         <span>NPWP: {t.npwp}</span>
                       )}
+                      {t.no_ktp && (
+                        <span>NIK: {t.no_ktp}</span>
+                      )}
                     </div>
 
                     {t.bank_name && t.bank_account_number && (
@@ -587,6 +592,34 @@ export default function MasterAdminTenantsPage() {
                       value={createForm.tax_rate}
                       onChange={(e) => setCreateForm({ ...createForm, tax_rate: parseFloat(e.target.value) || 0 })}
                       className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      Nomor Pokok Wajib Pajak (NPWP)
+                    </label>
+                    <input
+                      type="text"
+                      value={createForm.npwp}
+                      onChange={(e) => setCreateForm({ ...createForm, npwp: e.target.value })}
+                      placeholder="09.254.678.9-012.000"
+                      className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      Nomor NIK / KTP Owner
+                    </label>
+                    <input
+                      type="text"
+                      value={createForm.no_ktp}
+                      onChange={(e) => setCreateForm({ ...createForm, no_ktp: e.target.value })}
+                      placeholder="3171012304950001"
+                      className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-mono"
                     />
                   </div>
                 </div>

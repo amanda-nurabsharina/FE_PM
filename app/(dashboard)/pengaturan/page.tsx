@@ -13,6 +13,8 @@ import {
   ShieldCheck,
   Shield,
   Phone,
+  Percent,
+  Store,
 } from 'lucide-react';
 import { api, getStoredUser, setStoredUser } from '@/lib/api-client';
 import { UserProfile } from '@/lib/types';
@@ -33,6 +35,7 @@ export default function PengaturanPage() {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [company, setCompany] = useState('');
   const [phone, setPhone] = useState('');
+  const [noKtp, setNoKtp] = useState('');
   const [companyAddress, setCompanyAddress] = useState('');
   const [npwp, setNpwp] = useState('');
   const [taxRate, setTaxRate] = useState<number>(11);
@@ -64,6 +67,7 @@ export default function PengaturanPage() {
       setAvatarUrl(data.avatar_url || '');
       setCompany(data.company || '');
       setPhone(data.phone || '');
+      setNoKtp(data.no_ktp || '');
       setCompanyAddress(data.company_address || '');
       setNpwp(data.npwp || '');
       setTaxRate(data.tax_rate !== undefined ? data.tax_rate : 11);
@@ -98,6 +102,7 @@ export default function PengaturanPage() {
         name,
         company,
         phone,
+        no_ktp: noKtp,
         company_address: companyAddress,
         npwp,
         tax_rate: Number(taxRate),
@@ -295,84 +300,7 @@ export default function PengaturanPage() {
             </div>
           </div>
 
-          {/* Card 2: Identitas Studio, NPWP & PPN Default */}
-          <div className="p-5 sm:p-6 bg-white rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <Building className="w-4 h-4 text-indigo-600" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                2. Identitas Studio, NPWP & PPN Default
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Nama Perusahaan / Studio</label>
-                <input
-                  type="text"
-                  placeholder="Contoh: Reza Studio (Affiliator Network)"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Nomor Pokok Wajib Pajak (NPWP)</label>
-                <input
-                  type="text"
-                  placeholder="09.254.678.9-012.000"
-                  value={npwp}
-                  onChange={(e) => setNpwp(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block font-bold text-slate-700 mb-1">
-                  Tarif PPN Default (%) (Pintasan: 0% / 11% / 12%)
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.5"
-                    value={taxRate}
-                    onChange={(e) => setTaxRate(Number(e.target.value))}
-                    className="w-24 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-800 font-mono font-bold"
-                  />
-                  <div className="flex items-center gap-1">
-                    {[0, 11, 12].map((rate) => (
-                      <button
-                        key={rate}
-                        type="button"
-                        onClick={() => setTaxRate(rate)}
-                        className={`px-2.5 py-1.5 rounded-lg font-bold text-xs transition-colors ${
-                          taxRate === rate
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                        }`}
-                      >
-                        {rate}%
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block font-bold text-slate-700 mb-1">Alamat Lengkap Studio</label>
-                <textarea
-                  rows={2}
-                  value={companyAddress}
-                  onChange={(e) => setCompanyAddress(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3: Logo Studio */}
+          {/* Card 2: LOGO USAHA / CREATOR STUDIO (KOP KIRI ATAS INVOICE) */}
           <div className="p-5 sm:p-6 bg-white rounded-3xl border border-slate-200/90 shadow-2xs">
             <LogoUploader
               logoUrl={logoUrl}
@@ -381,20 +309,158 @@ export default function PengaturanPage() {
             />
           </div>
 
-          {/* Card 4: Tanda Tangan Digital */}
+          {/* Card 3: TANDA TANGAN DIGITAL RESMI (KOLOM KANAN BAWAH INVOICE) */}
           <div className="p-5 sm:p-6 bg-white rounded-3xl border border-slate-200/90 shadow-2xs">
             <SignatureCanvas
               value={signatureUrl}
               onChange={(url) => setSignatureUrl(url)}
+              ownerName={name}
             />
           </div>
 
-          {/* Card 5: Rekening Pembayaran Bank */}
+          {/* Card 4: LEGALITAS & DATA PAJAK (NPWP & NIK / KTP - TAMPIL DI INVOICE) */}
           <div className="p-5 sm:p-6 bg-white rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <CreditCard className="w-4 h-4 text-indigo-600" />
+              <ShieldCheck className="w-4 h-4 text-indigo-600" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                5. Rekening Pembayaran Bank (Footer Invoice)
+                LEGALITAS & DATA PAJAK (NPWP & NIK / KTP - TAMPIL DI INVOICE)
+              </h3>
+            </div>
+
+            <p className="text-xs text-slate-500 font-medium">
+              Keterangan NPWP dan NIK KTP ini dicantumkan secara otomatis pada rincian invoice tagihan klien untuk kepatuhan administrasi pajak.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Nomor NPWP Owner / Studio
+                </label>
+                <input
+                  type="text"
+                  placeholder="09.254.678.9-012.000"
+                  value={npwp}
+                  onChange={(e) => setNpwp(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                />
+                <span className="block text-[11px] text-slate-400 mt-1 font-medium">
+                  Nomor Pokok Wajib Pajak untuk faktur / invoice resmi.
+                </span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Nomor NIK / KTP
+                </label>
+                <input
+                  type="text"
+                  placeholder="3171012908950002"
+                  value={noKtp}
+                  onChange={(e) => setNoKtp(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                />
+                <span className="block text-[11px] text-slate-400 mt-1 font-medium">
+                  Nomor Induk Kependudukan 16 digit.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 5: IDENTITAS STUDIO & ALAMAT USAHA */}
+          <div className="p-5 sm:p-6 bg-white rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+              <Store className="w-4 h-4 text-indigo-600" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                IDENTITAS STUDIO & ALAMAT USAHA
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Nama Perusahaan / Creator Studio
+                </label>
+                <input
+                  type="text"
+                  placeholder="Reza Studio (Affiliator & Creator Network)"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Alamat Kantor / Studio
+                </label>
+                <input
+                  type="text"
+                  placeholder="Studio Kreatif Lt. 3, Jl. Senopati No. 42, Kebayoran Baru, Jakarta Selatan"
+                  value={companyAddress}
+                  onChange={(e) => setCompanyAddress(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Card 6: PENGATURAN TARIF PAJAK PPN INVOICE */}
+          <div className="p-5 sm:p-6 bg-white rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+              <Percent className="w-4 h-4 text-indigo-600" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                PENGATURAN TARIF PAJAK PPN INVOICE
+              </h3>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <label className="block font-bold text-slate-700">
+                Besaran Persentase PPN (%)
+              </label>
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="relative w-28">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.5"
+                    value={taxRate}
+                    onChange={(e) => setTaxRate(Number(e.target.value))}
+                    className="w-full pl-3.5 pr-8 py-2 rounded-xl border border-slate-200 text-slate-800 font-mono font-bold focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  />
+                  <span className="absolute right-3 top-2 text-xs font-bold text-slate-400 pointer-events-none">
+                    %
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {[11, 12, 10, 0].map((rate) => (
+                    <button
+                      key={rate}
+                      type="button"
+                      onClick={() => setTaxRate(rate)}
+                      className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-colors ${
+                        taxRate === rate
+                          ? 'bg-indigo-600 text-white shadow-xs'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {rate}%
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-400 font-medium">
+                Nilai persentase ini akan digunakan sebagai tarif default saat membuat invoice baru, serta ditampilkan pada rincian tagihan invoice.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 7: INFORMASI REKENING PEMBAYARAN (TAMPIL DI INVOICE) */}
+          <div className="p-5 sm:p-6 bg-white rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+              <CreditCard className="w-4 h-4 text-emerald-600" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                INFORMASI REKENING PEMBAYARAN (TAMPIL DI INVOICE)
               </h3>
             </div>
 
@@ -406,7 +472,7 @@ export default function PengaturanPage() {
                   placeholder="Bank Central Asia (BCA)"
                   value={bankName}
                   onChange={(e) => setBankName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 />
               </div>
 
@@ -417,18 +483,18 @@ export default function PengaturanPage() {
                   placeholder="8830192831"
                   value={bankAccountNumber}
                   onChange={(e) => setBankAccountNumber(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono font-bold text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Atas Nama Pemilik</label>
+                <label className="block font-bold text-slate-700 mb-1">Atas Nama (Holder)</label>
                 <input
                   type="text"
                   placeholder="Reza Winata"
                   value={bankAccountHolder}
                   onChange={(e) => setBankAccountHolder(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -442,7 +508,7 @@ export default function PengaturanPage() {
               className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-200 flex items-center gap-2 transition-all disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              {saving ? 'Menyimpan...' : 'Simpan Perubahan Profil, Logo & Tanda Tangan'}
+              {saving ? 'Menyimpan...' : 'Simpan Seluruh Pengaturan Profil & Invoice'}
             </button>
           </div>
         </form>

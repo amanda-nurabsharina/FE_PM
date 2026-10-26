@@ -1,16 +1,17 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { PenTool, Upload, RotateCcw, Check, Trash2 } from 'lucide-react';
+import { PenTool, Upload, RotateCcw, Check, Trash2, Feather, CheckCircle } from 'lucide-react';
 import { api } from '@/lib/api-client';
 
 interface SignatureCanvasProps {
   value: string;
   onChange: (val: string) => void;
+  ownerName?: string;
 }
 
-export default function SignatureCanvas({ value, onChange }: SignatureCanvasProps) {
-  const [mode, setMode] = useState<'draw' | 'upload'>('draw');
+export default function SignatureCanvas({ value, onChange, ownerName = 'Reza Winata' }: SignatureCanvasProps) {
+  const [mode, setMode] = useState<'upload' | 'draw'>('upload');
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
@@ -97,53 +98,89 @@ export default function SignatureCanvas({ value, onChange }: SignatureCanvasProp
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <label className="text-xs font-bold text-slate-700">Tanda Tangan Digital Resmi</label>
-        {value && (
-          <button
-            type="button"
-            onClick={() => onChange('')}
-            className="text-[11px] font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1"
-          >
-            <Trash2 className="w-3.5 h-3.5" /> Hapus TTD
-          </button>
+    <div className="space-y-4">
+      {/* Header matching screenshot */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+        <div className="flex items-center gap-2">
+          <Feather className="w-4 h-4 text-indigo-600 shrink-0" />
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+            TANDA TANGAN DIGITAL RESMI (KOLOM KANAN BAWAH INVOICE)
+          </h3>
+        </div>
+        {value ? (
+          <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full flex items-center gap-1 self-start sm:self-auto">
+            <Check className="w-3 h-3 text-emerald-600" /> TTD Aktif
+          </span>
+        ) : (
+          <span className="text-[11px] font-medium text-slate-400 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full self-start sm:self-auto">
+            Belum Diatur
+          </span>
         )}
       </div>
 
+      <p className="text-xs text-slate-500 font-medium">
+        Tanda tangan digital ini akan disematkan di kolom <strong className="text-slate-700">kanan bawah</strong> invoice resmi sebagai pengesahan dokumen tagihan profesional.
+      </p>
+
       {/* Mode Switcher Tabs */}
-      <div className="grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={() => setMode('draw')}
-          className={`py-1.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-            mode === 'draw'
-              ? 'bg-indigo-600 text-white shadow-2xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          <PenTool className="w-3.5 h-3.5" /> Gores di Kanvas
-        </button>
+      <div className="flex items-center gap-2 flex-wrap">
         <button
           type="button"
           onClick={() => setMode('upload')}
-          className={`py-1.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
             mode === 'upload'
-              ? 'bg-indigo-600 text-white shadow-2xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-transparent'
           }`}
         >
-          <Upload className="w-3.5 h-3.5" /> Upload File TTD
+          <Upload className="w-3.5 h-3.5" /> Unggah File Gambar
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('draw')}
+          className={`py-2 px-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+            mode === 'draw'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-transparent'
+          }`}
+        >
+          <PenTool className="w-3.5 h-3.5" /> Coret Langsung di Layar (Canvas)
         </button>
       </div>
 
+      {/* Mode: Upload */}
+      {mode === 'upload' && (
+        <div className="p-3 sm:p-4 bg-slate-50/80 border border-slate-200/90 rounded-2xl flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="relative inline-block shrink-0">
+            <input
+              type="file"
+              accept="image/png, image/jpeg, image/webp"
+              onChange={handleFileUpload}
+              disabled={uploading}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+            />
+            <button
+              type="button"
+              disabled={uploading}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs shadow-indigo-200 flex items-center gap-2 transition-all disabled:opacity-50"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              {uploading ? 'Mengunggah...' : 'Pilih Berkas Tanda Tangan (PNG/JPG)'}
+            </button>
+          </div>
+          <span className="text-[11px] text-slate-500 font-medium">
+            Dianjurkan menggunakan gambar PNG berlatar transparan.
+          </span>
+        </div>
+      )}
+
       {/* Mode: Draw on Touch Canvas */}
       {mode === 'draw' && (
-        <div className="space-y-2">
+        <div className="p-4 bg-slate-50/80 border border-slate-200/90 rounded-2xl space-y-3">
           <div className="border border-slate-300 rounded-2xl bg-white overflow-hidden shadow-inner flex justify-center">
             <canvas
               ref={canvasRef}
-              width={380}
+              width={420}
               height={140}
               onMouseDown={startDrawing}
               onMouseMove={draw}
@@ -160,7 +197,7 @@ export default function SignatureCanvas({ value, onChange }: SignatureCanvasProp
             <button
               type="button"
               onClick={clearCanvas}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-1"
+              className="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-1 bg-white"
             >
               <RotateCcw className="w-3.5 h-3.5" /> Bersihkan
             </button>
@@ -168,7 +205,7 @@ export default function SignatureCanvas({ value, onChange }: SignatureCanvasProp
               type="button"
               onClick={applyCanvas}
               disabled={!hasDrawn}
-              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1 disabled:opacity-40 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 disabled:opacity-40 transition-all shadow-xs"
             >
               <Check className="w-3.5 h-3.5" /> Terapkan Goresan
             </button>
@@ -176,35 +213,30 @@ export default function SignatureCanvas({ value, onChange }: SignatureCanvasProp
         </div>
       )}
 
-      {/* Mode: Upload */}
-      {mode === 'upload' && (
-        <div className="border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-2xl p-4 text-center cursor-pointer relative bg-slate-50/60">
-          <input
-            type="file"
-            accept="image/png, image/jpeg, image/webp"
-            onChange={handleFileUpload}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          />
-          <div className="flex flex-col items-center justify-center py-2">
-            <Upload className="w-6 h-6 text-slate-400 mb-1" />
-            <span className="text-xs font-semibold text-slate-700">
-              {uploading ? 'Mengunggah...' : 'Pilih gambar tanda tangan (transparan disarankan)'}
-            </span>
-            <span className="text-[10px] text-slate-400 mt-0.5">PNG / JPG (Maks. 2 MB)</span>
-          </div>
-        </div>
-      )}
-
-      {/* Active Signature Preview */}
+      {/* Active Signature Preview matching screenshot */}
       {value && (
-        <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-              Pratinjau Tanda Tangan Aktif:
-            </span>
-            <img src={value} alt="Signature Preview" className="h-12 object-contain mt-1" />
+        <div className="p-3 sm:p-4 bg-white border border-slate-200/90 rounded-2xl shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-28 h-14 bg-white border border-slate-200 rounded-xl flex items-center justify-center p-1 overflow-hidden shrink-0">
+              <img src={value} alt="Signature Preview" className="max-h-full max-w-full object-contain" />
+            </div>
+            <div>
+              <span className="font-bold text-slate-800 text-xs block">
+                {ownerName}
+              </span>
+              <span className="text-[11px] font-medium text-indigo-600 block mt-0.5">
+                Tanda Tangan Terverifikasi untuk Invoice
+              </span>
+            </div>
           </div>
-          <span className="text-xs font-bold text-emerald-600">✓ Siap Dicetak</span>
+
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            className="self-end sm:self-auto px-3 py-1.5 text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl flex items-center gap-1.5 transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Hapus TTD
+          </button>
         </div>
       )}
     </div>
