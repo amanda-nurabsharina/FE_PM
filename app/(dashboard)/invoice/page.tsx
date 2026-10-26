@@ -32,7 +32,17 @@ export default function InvoicePage() {
   const [payTargetInvoice, setPayTargetInvoice] = useState<Invoice | null>(null);
   const [lightboxUrl, setLightboxUrl] = useState<string>('');
 
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => getStoredUser());
   const user = getStoredUser();
+
+  useEffect(() => {
+    api.getSettings().then((data) => {
+      if (data) {
+        setCurrentUser(data);
+        setStoredUser(data);
+      }
+    }).catch(console.error);
+  }, []);
 
   useEffect(() => {
     loadMonths();
@@ -95,7 +105,7 @@ export default function InvoicePage() {
         <div>
           <h2 className="text-xl font-black text-slate-900 tracking-tight">Generator Invoice & Tagihan</h2>
           <p className="text-xs text-slate-500 font-medium">
-            Tagihan komisi affiliate & endorse dengan tarif PPN {user?.tax_rate || 11}%, PIC klien, dan status pembayaran.
+            Tagihan komisi affiliate & endorse dengan tarif PPN {user?.tax_rate !== undefined ? user.tax_rate : 11}%, PIC klien, dan status pembayaran.
           </p>
         </div>
 
@@ -225,7 +235,8 @@ export default function InvoicePage() {
           setPrintInvoice(null);
         }}
         invoice={printInvoice}
-        owner={user}
+        owner={currentUser || user}
+        onInvoiceUpdated={() => loadInvoices()}
       />
 
       <PaymentConfirmModal

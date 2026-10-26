@@ -15,6 +15,7 @@ export default function TaskCreateModal({ isOpen, onClose, onSuccess }: TaskCrea
   const [title, setTitle] = useState('');
   const [brand, setBrand] = useState('');
   const [feeOrValue, setFeeOrValue] = useState<number>(0);
+  const [autoInvoice, setAutoInvoice] = useState(true);
   const [dueDate, setDueDate] = useState('');
   const [deliverable, setDeliverable] = useState('');
   const [platform, setPlatform] = useState('');
@@ -73,6 +74,7 @@ export default function TaskCreateModal({ isOpen, onClose, onSuccess }: TaskCrea
         status,
         brief,
         checklist,
+        auto_invoice: taskType === 'endorse' ? autoInvoice : false,
       });
       onSuccess();
       onClose();
@@ -187,6 +189,28 @@ export default function TaskCreateModal({ isOpen, onClose, onSuccess }: TaskCrea
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 font-mono focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 />
               </div>
+            </div>
+          )}
+
+          {/* Checkbox "Buat Invoice Otomatis" (Poin 7 Revisi - Hanya untuk Endorse) */}
+          {taskType === 'endorse' && (
+            <div
+              onClick={() => setAutoInvoice(!autoInvoice)}
+              className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 hover:bg-slate-100/70 transition-colors cursor-pointer select-none"
+            >
+              <div>
+                <span className="block text-xs font-bold text-slate-800">Buat Invoice Otomatis</span>
+                <span className="block text-[11px] text-slate-500 font-medium mt-0.5">
+                  Terbitkan tagihan otomatis saat tugas endorse dibuat
+                </span>
+              </div>
+              <input
+                type="checkbox"
+                checked={autoInvoice}
+                onChange={(e) => setAutoInvoice(e.target.checked)}
+                onClick={(e) => e.stopPropagation()}
+                className="w-4 h-4 rounded text-indigo-600 accent-indigo-600 focus:ring-indigo-500 cursor-pointer"
+              />
             </div>
           )}
 

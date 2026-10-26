@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Upload, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Task, Invoice } from '@/lib/types';
 import { formatIDR } from '@/lib/formatters';
-import { api, getStoredUser } from '@/lib/api-client';
+import { api, getStoredUser, setStoredUser } from '@/lib/api-client';
 
 interface PaymentConfirmModalProps {
   isOpen: boolean;
@@ -25,24 +25,61 @@ export default function PaymentConfirmModal({
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [linkedInvoice, setLinkedInvoice] = useState<Invoice | null>(targetInvoice || null);
+  const [currentTaxRate, setCurrentTaxRate] = useState<number>(() => {
+    const user = getStoredUser();
+    return user?.tax_rate !== undefined ? Number(user.tax_rate) : 0;
+  });
+
+  useEffect(() => {
+    if (isOpen) {
+      api.getSettings().then((data) => {
+        if (data && data.tax_rate !== undefined) {
+          setCurrentTaxRate(Number(data.tax_rate));
+          setStoredUser(data);
+        }
+      }).catch(console.error);
+
+      if (targetInvoice) {
+        setLinkedInvoice(targetInvoice);
+      } else if (targetTask?.related_invoice_id) {
+        api.getInvoiceById(targetTask.related_invoice_id)
+          .then((inv) => setLinkedInvoice(inv))
+          .catch(console.error);
+      } else {
+        setLinkedInvoice(null);
+      }
+    } else {
+      setFile(null);
+      setPreviewUrl('');
+      setError('');
+    }
+  }, [isOpen, targetInvoice, targetTask]);
 
   if (!isOpen) return null;
 
-  const user = getStoredUser();
-  const taxRate = user?.tax_rate || 11;
+  // Read values directly from invoice if available (PPN aktif/tidak, tarif, total - Poin 9 Revisi)
+  const effectiveInvoice = targetInvoice || linkedInvoice;
 
-  // Calculate Subtotal & PPN
-  const subtotal = targetTask
-    ? targetTask.fee_or_value
-    : targetInvoice
-    ? targetInvoice.subtotal
-    : 0;
+  let subtotal = 0;
+  let taxRate = currentTaxRate;
+  let isTaxActive = false;
+  let taxAmount = 0;
+  let grandTotal = 0;
 
-  const taxAmount = targetInvoice
-    ? targetInvoice.tax_amount
-    : Math.round((subtotal * taxRate) / 100);
-
-  const grandTotal = targetInvoice ? targetInvoice.grand_total : subtotal + taxAmount;
+  if (effectiveInvoice) {
+    subtotal = effectiveInvoice.subtotal;
+    taxRate = effectiveInvoice.tax_rate !== undefined ? effectiveInvoice.tax_rate : currentTaxRate;
+    isTaxActive = Boolean(effectiveInvoice.include_tax && effectiveInvoice.tax_rate > 0);
+    taxAmount = isTaxActive ? (effectiveInvoice.tax_amount || 0) : 0;
+    grandTotal = isTaxActive ? effectiveInvoice.grand_total : effectiveInvoice.subtotal;
+  } else if (targetTask) {
+    subtotal = targetTask.fee_or_value;
+    taxRate = currentTaxRate;
+    isTaxActive = currentTaxRate > 0;
+    taxAmount = isTaxActive ? Math.round((subtotal * currentTaxRate) / 100) : 0;
+    grandTotal = subtotal + taxAmount;
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -76,7 +113,8 @@ export default function PaymentConfirmModal({
       }
 
       if (targetTask) {
-        await api.markTaskPaid(targetTask.id, uploadedUrl, uploadedName);
+        const passTaxRate = isTaxActive ? taxRate : 0;
+        await api.markTaskPaid(targetTask.id, uploadedUrl, uploadedName, passTaxRate);
       } else if (targetInvoice) {
         await api.markInvoicePaid(targetInvoice.id, uploadedUrl, uploadedName);
       }
@@ -123,10 +161,15 @@ export default function PaymentConfirmModal({
             <p className="text-xs font-bold text-slate-900">
               {targetTask ? `${targetTask.brand} - ${targetTask.title}` : targetInvoice?.client_name}
             </p>
-            {targetInvoice && (
-              <span className="inline-block text-[10px] font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
-                {targetInvoice.invoice_number}
-              </span>
+            {effectiveInvoice && (
+              <div className="flex items-center gap-2">
+                <span className="inline-block text-[10px] font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                  {effectiveInvoice.invoice_number}
+                </span>
+                <span className="text-[10px] font-semibold text-slate-500">
+                  • {isTaxActive ? `PPN ${taxRate}% Aktif` : 'Tanpa PPN'}
+                </span>
+              </div>
             )}
           </div>
 
@@ -137,7 +180,7 @@ export default function PaymentConfirmModal({
               <span className="font-mono font-semibold">{formatIDR(subtotal)}</span>
             </div>
             <div className="flex justify-between text-xs text-slate-300">
-              <span>PPN ({taxRate}%)</span>
+              <span>{isTaxActive ? `PPN (${taxRate}%)` : taxRate === 0 ? 'PPN (0%)' : 'Tanpa PPN'}</span>
               <span className="font-mono font-semibold">{formatIDR(taxAmount)}</span>
             </div>
             <div className="border-t border-slate-700 pt-2 flex justify-between text-sm font-bold text-emerald-400">

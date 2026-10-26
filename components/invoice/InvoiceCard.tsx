@@ -64,7 +64,7 @@ export default function InvoiceCard({
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> MENUNGGU (UNPAID)
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> TERKIRIM
             </span>
           )}
         </div>
@@ -74,7 +74,7 @@ export default function InvoiceCard({
       <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
         <div>
           <span className="text-[10px] text-slate-400 block font-medium">
-            {invoice.include_tax ? `Total (Termasuk PPN ${invoice.tax_rate}%)` : 'Total (Tanpa PPN)'}
+            {invoice.include_tax && invoice.tax_rate > 0 ? `Total (Termasuk PPN ${invoice.tax_rate}%)` : 'Total (Tanpa PPN)'}
           </span>
           <span className="text-sm font-black font-mono text-slate-900">
             {formatIDR(invoice.grand_total)}
@@ -88,12 +88,12 @@ export default function InvoiceCard({
             onClick={handleToggleTax}
             disabled={toggling}
             className={`text-[10px] font-bold px-2.5 py-1.5 rounded-lg border transition-all ${
-              invoice.include_tax
+              invoice.include_tax && invoice.tax_rate > 0
                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-2xs'
                 : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'
             }`}
           >
-            {toggling ? '...' : invoice.include_tax ? `PPN ${invoice.tax_rate}% Aktif` : 'Tanpa PPN (0%)'}
+            {toggling ? '...' : invoice.include_tax && invoice.tax_rate > 0 ? `PPN ${invoice.tax_rate}% Aktif` : 'Tanpa PPN (0%)'}
           </button>
         ) : (
           <span className="text-[10px] font-semibold text-slate-400 flex items-center gap-1">

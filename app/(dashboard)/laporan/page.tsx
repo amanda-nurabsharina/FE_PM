@@ -24,8 +24,19 @@ export default function LaporanPage() {
   const [includeAttachments, setIncludeAttachments] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string>('');
   const [isAuditDrawerOpen, setIsAuditDrawerOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => getStoredUser());
+  const [fullReport, setFullReport] = useState<ReportResponse | null>(null);
 
   const user = getStoredUser();
+
+  useEffect(() => {
+    api.getSettings().then((data) => {
+      if (data) {
+        setCurrentUser(data);
+        setStoredUser(data);
+      }
+    }).catch(console.error);
+  }, []);
 
   const months = [
     { value: 0, label: 'Semua Bulan' },
@@ -77,6 +88,24 @@ export default function LaporanPage() {
     window.print();
   };
 
+  const handleOpenPrintModal = async () => {
+    setIsPrintModalOpen(true);
+    try {
+      const fullData = await api.getReports({
+        month: selectedMonth > 0 ? selectedMonth : undefined,
+        year: selectedYear > 0 ? selectedYear : undefined,
+        type: coopType,
+        page: 1,
+        limit: 0, // Request all projects without pagination limit for PDF printing (FR-LAP-07)
+      });
+      if (fullData) {
+        setFullReport(fullData);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const projects = report?.projects || [];
   const rowsWithProof = projects.filter((p) => p.payment_proof_url);
 
@@ -96,7 +125,7 @@ export default function LaporanPage() {
         </div>
 
         <button
-          onClick={() => setIsPrintModalOpen(true)}
+          onClick={handleOpenPrintModal}
           className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all self-start sm:self-auto shrink-0"
         >
           <Printer className="w-4 h-4" /> Cetak PDF
@@ -308,6 +337,88 @@ export default function LaporanPage() {
         )}
       </div>
 
+      {/* 4.1 RINCIAN PENGELUARAN OPERASIONAL & REKONSILIASI KAS */}
+      <div className="p-5 bg-white rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+              RINCIAN PENGELUARAN & REKONSILIASI ARUS KAS
+            </h4>
+            <p className="text-[11px] text-slate-400">Rincian beban biaya operasional & produksi periode {report?.period_label || 'ini'}</p>
+          </div>
+          <span className="text-xs text-rose-600 font-bold bg-rose-50 px-3 py-1 rounded-full border border-rose-100">
+            Total Beban: {formatIDR(report?.total_expense || 0)}
+          </span>
+        </div>
+
+        {/* Expenses Table */}
+        {!report?.expenses || report.expenses.length === 0 ? (
+          <div className="py-6 text-center text-slate-400 text-xs">
+            Tidak ada transaksi pengeluaran operasional pada periode ini
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {report.expenses.map((exp, idx) => (
+              <div
+                key={exp.id || idx}
+                className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 flex items-center justify-between gap-3 text-xs"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] font-mono font-bold text-slate-400">#{exp.index || idx + 1}</span>
+                  <div>
+                    <h5 className="font-bold text-slate-900">{exp.description}</h5>
+                    <div className="text-[10px] text-slate-400 flex items-center gap-2 mt-0.5">
+                      <span className="px-1.5 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600 font-medium">{exp.category}</span>
+                      <span>•</span>
+                      <span>{exp.date}</span>
+                    </div>
+                  </div>
+                </div>
+                <span className="text-xs font-black font-mono text-rose-600 whitespace-nowrap">
+                  {formatIDR(exp.amount)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Ringkasan Rekonsiliasi 3 Angka */}
+        <div className="p-4 bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl">
+          <div className="flex items-center justify-between mb-3 border-b border-indigo-800/60 pb-2">
+            <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider">
+              Rekonsiliasi Arus Kas Bersih (Cashflow Reconciliation)
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium">Ref: FR-LAP-11, BR-23</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="p-3 bg-white/5 border border-white/10 rounded-xl">
+              <span className="text-[10px] text-emerald-400 block font-bold uppercase tracking-wider mb-1">
+                Total Kas Masuk (Lunas)
+              </span>
+              <span className="text-base font-black font-mono text-emerald-300">
+                {formatIDR(report?.total_paid || 0)}
+              </span>
+            </div>
+            <div className="p-3 bg-white/5 border border-white/10 rounded-xl">
+              <span className="text-[10px] text-rose-400 block font-bold uppercase tracking-wider mb-1">
+                Total Beban Pengeluaran
+              </span>
+              <span className="text-base font-black font-mono text-rose-300">
+                {formatIDR(report?.total_expense || 0)}
+              </span>
+            </div>
+            <div className="p-3 bg-white/5 border border-white/10 rounded-xl">
+              <span className="text-[10px] text-indigo-300 block font-bold uppercase tracking-wider mb-1">
+                Arus Kas Bersih (Net)
+              </span>
+              <span className={`text-base font-black font-mono ${(report?.net_income || 0) >= 0 ? 'text-indigo-200' : 'text-rose-400'}`}>
+                {formatIDR(report?.net_income || 0)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 5. Pemicu Audit Log Bar di Bawah */}
       <div
         onClick={() => setIsAuditDrawerOpen(true)}
@@ -345,70 +456,83 @@ export default function LaporanPage() {
       />
 
       {/* Fullscreen PDF Print & Preview Modal */}
-      {isPrintModalOpen && user && report && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="bg-slate-100 rounded-3xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
-            {/* Modal Toolbar (hidden on print) */}
-            <div className="no-print px-6 py-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h3 className="font-bold text-slate-900 text-sm sm:text-base">
-                  Pratinjau Dokumen Laporan A4
-                </h3>
-                <p className="text-xs text-slate-500">Periode: {report.period_label || 'Semua Periode'}</p>
+      {isPrintModalOpen && (currentUser || user) && (fullReport || report) && (() => {
+        const effectiveUser = currentUser || user!;
+        const activeReport = fullReport || report!;
+        const printProjects = activeReport.projects || [];
+        const printRowsWithProof = printProjects.filter((p) => p.payment_proof_url);
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="bg-slate-100 rounded-3xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+              {/* Modal Toolbar (hidden on print) */}
+              <div className="no-print px-6 py-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-bold text-slate-900 text-sm sm:text-base">
+                    Pratinjau Dokumen Laporan A4
+                  </h3>
+                  <p className="text-xs text-slate-500">Periode: {activeReport.period_label || 'Semua Periode'}</p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={includeAttachments}
+                      onChange={(e) => setIncludeAttachments(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded-sm"
+                    />
+                    Sertakan Lembar 2 (Lampiran Bukti Gambar)
+                  </label>
+
+                  <button
+                    onClick={handlePrint}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-200 flex items-center gap-1.5 transition-all"
+                  >
+                    <Printer className="w-4 h-4" /> Cetak / Simpan PDF
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsPrintModalOpen(false);
+                      setFullReport(null);
+                    }}
+                    className="p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={includeAttachments}
-                    onChange={(e) => setIncludeAttachments(e.target.checked)}
-                    className="w-4 h-4 text-indigo-600 rounded-sm"
+              {/* Scrollable Printable Document Container */}
+              <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-200/50 flex flex-col items-center gap-6">
+                <div id="printable-report-document" className="bg-white shadow-xl rounded-sm">
+                  <ReportSheetOne
+                    owner={effectiveUser}
+                    periodLabel={activeReport.period_label || 'Semua Periode'}
+                    coopFilter={coopType}
+                    totalProjects={activeReport.total_projects || 0}
+                    totalRevenue={activeReport.total_fee_revenue || 0}
+                    totalPaid={activeReport.total_paid || 0}
+                    totalUnpaid={activeReport.total_unpaid || 0}
+                    totalExpense={activeReport.total_expense || 0}
+                    netIncome={activeReport.net_income || 0}
+                    expenses={activeReport.expenses || []}
+                    rows={printProjects}
                   />
-                  Sertakan Lembar 2 (Lampiran Bukti Gambar)
-                </label>
 
-                <button
-                  onClick={handlePrint}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-200 flex items-center gap-1.5 transition-all"
-                >
-                  <Printer className="w-4 h-4" /> Cetak / Simpan PDF
-                </button>
-
-                <button
-                  onClick={() => setIsPrintModalOpen(false)}
-                  className="p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Scrollable Printable Document Container */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-200/50 flex flex-col items-center gap-6">
-              <div id="printable-report-document" className="bg-white shadow-xl rounded-sm">
-                <ReportSheetOne
-                  owner={user}
-                  periodLabel={report.period_label || 'Semua Periode'}
-                  coopFilter={coopType}
-                  totalProjects={report.total_projects || 0}
-                  totalRevenue={report.total_fee_revenue || 0}
-                  totalPaid={report.total_paid || 0}
-                  totalUnpaid={report.total_unpaid || 0}
-                  rows={projects}
-                />
-
-                {includeAttachments && rowsWithProof.length > 0 && (
-                  <ReportSheetTwo
-                    periodLabel={report.period_label}
-                    rowsWithProof={rowsWithProof}
-                  />
-                )}
+                  {includeAttachments && printRowsWithProof.length > 0 && (
+                    <ReportSheetTwo
+                      periodLabel={activeReport.period_label}
+                      rowsWithProof={printRowsWithProof}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

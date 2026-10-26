@@ -211,6 +211,11 @@ export const api = {
     body: JSON.stringify(data),
   }),
 
+  updateTask: (id: number, data: any) => request(`/creator/tasks/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+
   updateTaskStatus: (id: number, status: string) => request(`/creator/tasks/${id}/status`, {
     method: 'PUT',
     body: JSON.stringify({ status }),
@@ -220,9 +225,9 @@ export const api = {
     method: 'POST',
   }),
 
-  markTaskPaid: (taskId: number, payment_proof_url: string, payment_proof_name: string) => request(`/creator/tasks/${taskId}/pay`, {
+  markTaskPaid: (taskId: number, payment_proof_url: string, payment_proof_name: string, tax_rate?: number) => request(`/creator/tasks/${taskId}/pay`, {
     method: 'POST',
-    body: JSON.stringify({ payment_proof_url, payment_proof_name }),
+    body: JSON.stringify({ payment_proof_url, payment_proof_name, tax_rate }),
   }),
 
   deleteTask: (id: number) => request(`/creator/tasks/${id}`, {

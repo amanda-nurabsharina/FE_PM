@@ -77,40 +77,40 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <form onSubmit={handleManualLogin} className="space-y-3.5">
-          {tenantSlug ? (
-            <div className="p-2.5 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between text-xs text-indigo-900 font-semibold">
-              <span className="flex items-center gap-1.5 truncate">
-                <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
-                Workspace: <span className="font-mono font-bold">{tenantSlug}</span>
-              </span>
-              <button
-                type="button"
-                onClick={() => setTenantSlug('')}
-                className="text-slate-400 hover:text-slate-700 text-xs px-1"
-                title="Hapus slug workspace"
-              >
-                ✕
-              </button>
-            </div>
-          ) : showTenantInput ? (
+          {showTenantInput ? (
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-xs font-bold text-slate-700">Workspace / Slug Tenant (Opsional)</label>
                 <button
                   type="button"
-                  onClick={() => setShowTenantInput(false)}
+                  onClick={() => {
+                    setShowTenantInput(false);
+                    setTenantSlug('');
+                  }}
                   className="text-[10px] text-slate-400 hover:text-slate-600"
                 >
                   Sembunyikan
                 </button>
               </div>
-              <input
-                type="text"
-                value={tenantSlug}
-                onChange={(e) => setTenantSlug(e.target.value.toLowerCase().trim())}
-                placeholder="e.g. reza-studio"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono text-indigo-700 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={tenantSlug}
+                  onChange={(e) => setTenantSlug(e.target.value.toLowerCase().trim())}
+                  placeholder="e.g. reza-studio"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono text-indigo-700 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 pr-8"
+                />
+                {tenantSlug && (
+                  <button
+                    type="button"
+                    onClick={() => setTenantSlug('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs px-1"
+                    title="Hapus slug workspace"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <div className="text-right">

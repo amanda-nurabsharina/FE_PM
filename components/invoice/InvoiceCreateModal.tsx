@@ -22,8 +22,10 @@ export default function InvoiceCreateModal({
   onClose,
   onSuccess,
 }: InvoiceCreateModalProps) {
-  const user = getStoredUser();
-  const defaultTaxRate = user?.tax_rate || 11;
+  const [taxRate, setTaxRate] = useState<number>(() => {
+    const user = getStoredUser();
+    return user?.tax_rate !== undefined ? Number(user.tax_rate) : 11;
+  });
 
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
@@ -36,6 +38,16 @@ export default function InvoiceCreateModal({
   ]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      api.getSettings().then((data) => {
+        if (data && data.tax_rate !== undefined) {
+          setTaxRate(Number(data.tax_rate));
+        }
+      }).catch(console.error);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -56,7 +68,7 @@ export default function InvoiceCreateModal({
   };
 
   const subtotal = items.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unit_price || 0), 0);
-  const taxAmount = includeTax ? Math.round((subtotal * defaultTaxRate) / 100) : 0;
+  const taxAmount = includeTax ? Math.round((subtotal * taxRate) / 100) : 0;
   const grandTotal = subtotal + taxAmount;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -260,7 +272,7 @@ export default function InvoiceCreateModal({
             </div>
             {includeTax && (
               <div className="flex justify-between text-slate-300">
-                <span>PPN ({defaultTaxRate}%)</span>
+                <span>PPN ({taxRate}%)</span>
                 <span className="font-mono">{formatIDR(taxAmount)}</span>
               </div>
             )}

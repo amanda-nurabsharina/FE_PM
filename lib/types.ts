@@ -212,6 +212,15 @@ export interface ReportRow {
   due_date: string;
 }
 
+export interface ReportExpenseItem {
+  index: number;
+  id: number;
+  description: string;
+  category: string;
+  amount: number;
+  date: string;
+}
+
 export interface ReportData {
   period_label: string;
   filter_type: string;
@@ -220,6 +229,9 @@ export interface ReportData {
   total_paid: number;
   total_unpaid: number;
   barter_valuation: number;
+  total_expense?: number;
+  net_income?: number;
+  expenses?: ReportExpenseItem[];
   projects: ReportRow[];
   pagination: PageMeta;
 }
