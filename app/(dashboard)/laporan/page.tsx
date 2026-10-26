@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Printer, Calendar, FileText, ExternalLink, History, ChevronUp, X, CheckSquare } from 'lucide-react';
-import { api, getStoredUser } from '@/lib/api-client';
+import { api, getStoredUser, setStoredUser } from '@/lib/api-client';
 import { ReportData, UserProfile } from '@/lib/types';
 import { formatIDR } from '@/lib/formatters';
 import LightboxModal from '@/components/common/LightboxModal';

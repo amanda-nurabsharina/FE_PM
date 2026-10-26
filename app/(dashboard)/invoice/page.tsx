@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plus, Calendar, FileText, CheckCircle2 } from 'lucide-react';
-import { api, getStoredUser } from '@/lib/api-client';
+import { api, getStoredUser, setStoredUser } from '@/lib/api-client';
 import { Invoice, PageMeta, MonthOption, UserProfile } from '@/lib/types';
 import InvoiceCard from '@/components/invoice/InvoiceCard';
 import InvoiceCreateModal from '@/components/invoice/InvoiceCreateModal';

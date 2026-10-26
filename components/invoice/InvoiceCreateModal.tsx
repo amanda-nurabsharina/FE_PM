@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
-import { api, getStoredUser } from '@/lib/api-client';
+import { api, getStoredUser, setStoredUser } from '@/lib/api-client';
 import { formatIDR } from '@/lib/formatters';
 
 interface InvoiceCreateModalProps {
