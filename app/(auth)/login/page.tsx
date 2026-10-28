@@ -14,6 +14,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const [quickUsers, setQuickUsers] = useState<any[]>([]);
+
   useEffect(() => {
     const token = getToken();
     const user = getStoredUser();
@@ -25,6 +27,9 @@ export default function LoginPage() {
       }
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
+        if (params.get('expired') === 'true') {
+          setError('Sesi telah berakhir atau token kedaluwarsa. Silakan login kembali.');
+        }
         const t = params.get('tenant');
         if (t) {
           setTenantSlug(t);
@@ -32,7 +37,26 @@ export default function LoginPage() {
         }
       }
     }
+
+    api.getQuickUsers().then((data) => {
+      if (Array.isArray(data)) {
+        setQuickUsers(data);
+      }
+    }).catch(console.error);
   }, [router]);
+
+  const handleQuickLogin = async (userEmail: string) => {
+    setError('');
+    setLoading(true);
+    try {
+      await api.quickLogin(userEmail);
+      router.replace('/beranda');
+    } catch (err: any) {
+      setError(err.message || 'Quick login gagal');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleManualLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,6 +181,27 @@ export default function LoginPage() {
             {loading ? 'Memvalidasi...' : 'Masuk ke Dashboard'}
           </button>
         </form>
+
+        {/* Quick Login One-Click for Dev/Demo */}
+        <div className="pt-2 border-t border-slate-100">
+          <p className="text-[11px] font-bold text-slate-500 mb-2.5 text-center uppercase tracking-wider">
+            Quick Login Demo (1-Click)
+          </p>
+          <div className="space-y-1.5">
+            <button
+              type="button"
+              onClick={() => handleQuickLogin('reza@studio.id')}
+              disabled={loading}
+              className="w-full py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl border border-indigo-200 transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-indigo-600" />
+                <span>Reza Winata</span>
+              </div>
+              <span className="text-[10px] bg-indigo-200/60 px-1.5 py-0.5 rounded text-indigo-800">Owner Studio</span>
+            </button>
+          </div>
+        </div>
 
         <div className="text-center text-[11px] text-slate-400">
           <span>Dilindungi JWT & Enkripsi Hash Bcrypt (BE_PM)</span>

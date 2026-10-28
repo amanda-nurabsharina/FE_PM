@@ -186,7 +186,7 @@ export default function InvoiceCreateModal({
                   onChange={(e) => setIncludeTax(e.target.checked)}
                   className="w-4 h-4 text-indigo-600 rounded-sm border-slate-300 focus:ring-indigo-500"
                 />
-                Sertakan PPN ({defaultTaxRate}%)
+                Sertakan PPN ({taxRate}%)
               </label>
             </div>
 

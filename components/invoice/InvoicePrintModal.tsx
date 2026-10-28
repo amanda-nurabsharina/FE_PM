@@ -30,6 +30,12 @@ export default function InvoicePrintModal({
   }, [invoice]);
 
   useEffect(() => {
+    if (owner) {
+      setCurrentOwner(owner);
+    }
+  }, [owner]);
+
+  useEffect(() => {
     if (isOpen) {
       api.getSettings().then((data) => {
         if (data) {

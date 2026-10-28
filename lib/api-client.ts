@@ -88,6 +88,12 @@ async function request(endpoint: string, options: RequestInit = {}) {
 
   const json = await res.json();
   if (!res.ok) {
+    if (res.status === 401) {
+      removeToken();
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/admin')) {
+        window.location.href = '/login?expired=true';
+      }
+    }
     throw new Error(json.message || 'Terjadi kesalahan sistem');
   }
   return json.data;
@@ -115,6 +121,12 @@ async function adminRequest(endpoint: string, options: RequestInit = {}) {
 
   const json = await res.json();
   if (!res.ok) {
+    if (res.status === 401) {
+      removeAdminToken();
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin/login')) {
+        window.location.href = '/admin/login?expired=true';
+      }
+    }
     throw new Error(json.message || 'Terjadi kesalahan sistem');
   }
   return json.data;
@@ -282,13 +294,14 @@ export const api = {
   }),
 
   // Reports
-  getReports: (params: { month?: number; year?: number; type?: string; page?: number; limit?: number } = {}) => {
+  getReports: (params: { month?: number; year?: number; type?: string; page?: number; limit?: number; all?: boolean } = {}) => {
     const q = new URLSearchParams();
-    if (params.month) q.set('month', String(params.month));
-    if (params.year) q.set('year', String(params.year));
-    if (params.type && params.type !== 'semua') q.set('type', params.type);
-    if (params.page) q.set('page', String(params.page));
-    if (params.limit) q.set('limit', String(params.limit));
+    if (params.month !== undefined && params.month > 0) q.set('month', String(params.month));
+    if (params.year !== undefined && params.year > 0) q.set('year', String(params.year));
+    if (params.type && params.type !== 'semua' && params.type !== 'all') q.set('type', params.type);
+    if (params.page !== undefined && params.page > 0) q.set('page', String(params.page));
+    if (params.limit !== undefined && params.limit !== null) q.set('limit', String(params.limit));
+    if (params.all) q.set('all', 'true');
     return request(`/creator/reports?${q.toString()}`);
   },
 

@@ -120,7 +120,7 @@ export default function MasterAdminTenantsPage() {
     try {
       await api.createTenant({
         ...createForm,
-        tax_rate: createForm.tax_rate !== undefined && createForm.tax_rate !== '' ? Number(createForm.tax_rate) : 11,
+        tax_rate: createForm.tax_rate !== undefined ? Number(createForm.tax_rate) : 11,
       });
       setSuccessToast(`Tenant "${createForm.name}" dan Owner "${createForm.owner_name}" berhasil dibuat!`);
       setIsCreateModalOpen(false);

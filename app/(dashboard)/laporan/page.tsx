@@ -25,7 +25,8 @@ export default function LaporanPage() {
   const [lightboxUrl, setLightboxUrl] = useState<string>('');
   const [isAuditDrawerOpen, setIsAuditDrawerOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => getStoredUser());
-  const [fullReport, setFullReport] = useState<ReportResponse | null>(null);
+  const [fullReport, setFullReport] = useState<ReportData | null>(null);
+  const [isPrintLoading, setIsPrintLoading] = useState(false);
 
   const user = getStoredUser();
 
@@ -90,6 +91,7 @@ export default function LaporanPage() {
 
   const handleOpenPrintModal = async () => {
     setIsPrintModalOpen(true);
+    setIsPrintLoading(true);
     try {
       const fullData = await api.getReports({
         month: selectedMonth > 0 ? selectedMonth : undefined,
@@ -97,12 +99,15 @@ export default function LaporanPage() {
         type: coopType,
         page: 1,
         limit: 0, // Request all projects without pagination limit for PDF printing (FR-LAP-07)
+        all: true,
       });
       if (fullData) {
         setFullReport(fullData);
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsPrintLoading(false);
     }
   };
 
@@ -471,7 +476,18 @@ export default function LaporanPage() {
                   <h3 className="font-bold text-slate-900 text-sm sm:text-base">
                     Pratinjau Dokumen Laporan A4
                   </h3>
-                  <p className="text-xs text-slate-500">Periode: {activeReport.period_label || 'Semua Periode'}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-slate-500">Periode: {activeReport.period_label || 'Semua Periode'}</p>
+                    {isPrintLoading ? (
+                      <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md animate-pulse">
+                        Memuat semua {report?.total_projects || ''} proyek...
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                        {printProjects.length} Proyek Tercetak
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -487,9 +503,19 @@ export default function LaporanPage() {
 
                   <button
                     onClick={handlePrint}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-200 flex items-center gap-1.5 transition-all"
+                    disabled={isPrintLoading}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-200 flex items-center gap-1.5 transition-all"
                   >
-                    <Printer className="w-4 h-4" /> Cetak / Simpan PDF
+                    {isPrintLoading ? (
+                      <>
+                        <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Menyiapkan PDF...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Printer className="w-4 h-4" /> Cetak / Simpan PDF
+                      </>
+                    )}
                   </button>
 
                   <button
