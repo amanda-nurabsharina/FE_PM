@@ -150,21 +150,6 @@ export const api = {
     return json.data;
   },
 
-  quickLogin: async (email: string) => {
-    const res = await fetch(`${API_BASE_URL}/auth/quick-login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.message || 'Quick login gagal');
-    if (json.data?.user?.role === 'SUPER_ADMIN') {
-      throw new Error('Akun Super Admin tidak dapat mengakses ruang kerja CreatorTask.');
-    }
-    setToken(json.data.token);
-    setStoredUser(json.data.user);
-    return json.data;
-  },
 
   // Master Admin Auth (Scoped to platform_admin_token - 100% ISOLATED)
   adminLogin: async (email: string, password: string) => {
@@ -187,11 +172,6 @@ export const api = {
     removeAdminToken();
   },
 
-  getQuickUsers: async () => {
-    const res = await fetch(`${API_BASE_URL}/auth/quick-users`);
-    const json = await res.json();
-    return json.data || [];
-  },
 
   logout: () => {
     removeToken();
