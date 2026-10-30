@@ -99,9 +99,20 @@ export default function InvoicePrintModal({
             <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 block">
               REVIEW DOKUMEN TAGIHAN (A4)
             </span>
-            <h3 className="font-mono font-bold text-slate-900 text-sm sm:text-base mt-0.5">
-              {currentInvoice.invoice_number}
-            </h3>
+            <div className="flex items-center gap-2 mt-0.5">
+              <h3 className="font-mono font-bold text-slate-900 text-sm sm:text-base">
+                {currentInvoice.invoice_number}
+              </h3>
+              {currentInvoice.status === 'paid' ? (
+                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Lunas (Paid)
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Pending
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

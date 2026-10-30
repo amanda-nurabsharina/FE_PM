@@ -197,7 +197,13 @@ export default function InvoicePage() {
       ) : invoices.length === 0 ? (
         <div className="p-12 text-center bg-white rounded-3xl border border-slate-200/90 shadow-2xs space-y-2">
           <FileText className="w-8 h-8 text-slate-300 mx-auto" />
-          <h4 className="text-sm font-bold text-slate-800">Tidak ada invoice ditemukan</h4>
+          <h4 className="text-sm font-bold text-slate-800">
+            {selectedStatus === 'unpaid'
+              ? 'Tidak ada invoice pending'
+              : selectedStatus === 'paid'
+              ? 'Tidak ada invoice lunas'
+              : 'Tidak ada invoice ditemukan'}
+          </h4>
           <p className="text-xs text-slate-400">Terbitkan invoice baru atau sesuaikan filter Anda</p>
         </div>
       ) : (

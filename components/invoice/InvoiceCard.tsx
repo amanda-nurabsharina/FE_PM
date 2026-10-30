@@ -63,8 +63,8 @@ export default function InvoiceCard({
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> LUNAS (PAID)
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> TERKIRIM
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> PENDING
             </span>
           )}
         </div>

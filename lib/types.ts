@@ -140,7 +140,7 @@ export interface Invoice {
   subtotal: number;
   tax_amount: number;
   grand_total: number;
-  status: 'unpaid' | 'paid';
+  status: 'unpaid' | 'paid' | 'pending';
   payment_proof_url?: string;
   payment_proof_name?: string;
   items?: InvoiceItem[];

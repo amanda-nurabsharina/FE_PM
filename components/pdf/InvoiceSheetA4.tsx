@@ -83,7 +83,7 @@ export default function InvoiceSheetA4({ invoice, owner, onToggleTax, taxTogglin
                 </span>
               ) : (
                 <span className="inline-block px-3 py-1 rounded-md bg-amber-100 text-amber-800 font-black text-[10px] tracking-wider uppercase border border-amber-300">
-                  BELUM DIBAYAR (UNPAID)
+                  PENDING (BELUM DIBAYAR)
                 </span>
               )}
             </div>
