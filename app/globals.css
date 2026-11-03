@@ -42,6 +42,15 @@ body {
   background: #94a3b8;
 }
 
+/* Prevent auto-zoom on input focus on iOS / mobile devices */
+@media screen and (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* Print Isolation Rules (Bab 6 SRS) */
 @media print {
   body {

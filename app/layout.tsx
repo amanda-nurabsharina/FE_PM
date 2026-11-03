@@ -1,9 +1,15 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: 'CreatorTask - Platform Manajemen Kampanye & Invoice Kreator',
   description: 'Aplikasi Manajemen Kerja Sama Kampanye, Invoice, dan Keuangan untuk Content Creator & Affiliator',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
