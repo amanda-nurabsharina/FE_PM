@@ -404,18 +404,18 @@ export default function PengaturanPage() {
             </div>
           </div>
 
-          {/* Card 6: PENGATURAN TARIF PAJAK PPN INVOICE */}
+          {/* Card 6: PENGATURAN TARIF PAJAK PPh INVOICE */}
           <div className="p-5 sm:p-6 bg-white rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
               <Percent className="w-4 h-4 text-indigo-600" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                PENGATURAN TARIF PAJAK PPN INVOICE
+                PENGATURAN TARIF PAJAK PPh INVOICE
               </h3>
             </div>
 
             <div className="space-y-2 text-xs">
               <label className="block font-bold text-slate-700">
-                Besaran Persentase PPN (%)
+                Besaran Persentase Pajak PPh (%)
               </label>
               <div className="flex items-center gap-2 flex-wrap">
                 <div className="relative w-28">

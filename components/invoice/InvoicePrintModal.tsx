@@ -84,7 +84,7 @@ export default function InvoicePrintModal({
     } catch (err: any) {
       // Revert optimistic if error
       setCurrentInvoice(currentInvoice);
-      alert(err.message || 'Gagal mengubah status PPN');
+      alert(err.message || 'Gagal mengubah status Pajak PPh');
     } finally {
       setTaxToggling(false);
     }

@@ -584,7 +584,7 @@ export default function MasterAdminTenantsPage() {
 
                   <div>
                     <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                      Tarif PPN Default (%)
+                      Tarif Pajak PPh Default (%)
                     </label>
                     <input
                       type="number"

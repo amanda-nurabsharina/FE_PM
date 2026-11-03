@@ -34,7 +34,7 @@ export default function InvoiceCard({
       await api.toggleInvoiceTax(invoice.id);
       onRefresh();
     } catch (err: any) {
-      alert(err.message || 'Gagal mengubah status PPN');
+      alert(err.message || 'Gagal mengubah status Pajak PPh');
     } finally {
       setToggling(false);
     }
@@ -70,11 +70,11 @@ export default function InvoiceCard({
         </div>
       </div>
 
-      {/* Middle Row: PPN Quick Toggle & Grand Total */}
+      {/* Middle Row: PPh Quick Toggle & Grand Total */}
       <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
         <div>
           <span className="text-[10px] text-slate-400 block font-medium">
-            {invoice.include_tax && invoice.tax_rate > 0 ? `Total (Termasuk PPN ${invoice.tax_rate}%)` : 'Total (Tanpa PPN)'}
+            {invoice.include_tax && invoice.tax_rate > 0 ? `Total (Termasuk PPh ${invoice.tax_rate}%)` : 'Total (Tanpa PPh)'}
           </span>
           <span className="text-sm font-black font-mono text-slate-900">
             {formatIDR(invoice.grand_total)}
@@ -93,7 +93,7 @@ export default function InvoiceCard({
                 : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'
             }`}
           >
-            {toggling ? '...' : invoice.include_tax && invoice.tax_rate > 0 ? `PPN ${invoice.tax_rate}% Aktif` : 'Tanpa PPN (0%)'}
+            {toggling ? '...' : invoice.include_tax && invoice.tax_rate > 0 ? `PPh ${invoice.tax_rate}% Aktif` : 'Tanpa PPh (0%)'}
           </button>
         ) : (
           <span className="text-[10px] font-semibold text-slate-400 flex items-center gap-1">

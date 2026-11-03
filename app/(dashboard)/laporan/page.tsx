@@ -227,7 +227,7 @@ export default function LaporanPage() {
           <span className="text-sm sm:text-xl font-black font-mono text-indigo-600 truncate block">
             {formatIDR(report?.total_fee_revenue || 0)}
           </span>
-          <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate">Termasuk PPN</span>
+          <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate">Termasuk Pajak PPh</span>
         </div>
 
         {/* SUDAH LUNAS */}

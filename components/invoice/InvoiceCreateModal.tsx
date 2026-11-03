@@ -186,7 +186,7 @@ export default function InvoiceCreateModal({
                   onChange={(e) => setIncludeTax(e.target.checked)}
                   className="w-4 h-4 text-indigo-600 rounded-sm border-slate-300 focus:ring-indigo-500"
                 />
-                Sertakan PPN ({taxRate}%)
+                Sertakan Pajak PPh ({taxRate}%)
               </label>
             </div>
 
@@ -272,7 +272,7 @@ export default function InvoiceCreateModal({
             </div>
             {includeTax && (
               <div className="flex justify-between text-slate-300">
-                <span>PPN ({taxRate}%)</span>
+                <span>Pajak PPh ({taxRate}%)</span>
                 <span className="font-mono">{formatIDR(taxAmount)}</span>
               </div>
             )}

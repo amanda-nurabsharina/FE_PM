@@ -114,7 +114,7 @@ export default function InvoiceSheetA4({ invoice, owner, onToggleTax, taxTogglin
             <div className="flex justify-between sm:justify-end gap-4 pt-1">
               <span className="text-slate-400 font-medium">Status Pajak:</span>
               <span className="font-semibold text-slate-800">
-                {isTaxActive ? `PPN ${invoice.tax_rate}%` : invoice.tax_rate === 0 ? 'PPN 0%' : 'Tanpa PPN'}
+                {isTaxActive ? `PPh ${invoice.tax_rate}%` : invoice.tax_rate === 0 ? 'PPh 0%' : 'Tanpa PPh'}
               </span>
             </div>
             <div className="flex justify-between sm:justify-end gap-4">
@@ -156,7 +156,7 @@ export default function InvoiceSheetA4({ invoice, owner, onToggleTax, taxTogglin
           </table>
         </div>
 
-        {/* Checkbox "Sertakan PPN (x%)" (Poin 9 Revisi - Review Dokumen Tagihan) */}
+        {/* Checkbox "Sertakan Pajak PPh (x%)" (Poin 9 Revisi - Review Dokumen Tagihan) */}
         {onToggleTax && (
           <div
             onClick={!isPaid && !taxToggling ? onToggleTax : undefined}
@@ -166,7 +166,7 @@ export default function InvoiceSheetA4({ invoice, owner, onToggleTax, taxTogglin
           >
             <div>
               <span className="block text-xs font-bold text-slate-800">
-                Sertakan PPN ({invoice.tax_rate !== undefined && invoice.tax_rate > 0 ? invoice.tax_rate : (owner?.tax_rate !== undefined ? owner.tax_rate : 11)}%):
+                Sertakan Pajak PPh ({invoice.tax_rate !== undefined && invoice.tax_rate > 0 ? invoice.tax_rate : (owner?.tax_rate !== undefined ? owner.tax_rate : 11)}%):
               </span>
               <span className="block text-[11px] text-slate-500 font-medium mt-0.5">
                 Centang untuk menyertakan perhitungan pajak pada total tagihan
@@ -194,7 +194,7 @@ export default function InvoiceSheetA4({ invoice, owner, onToggleTax, taxTogglin
               <span className="font-mono font-bold text-slate-800">{formatIDR(invoice.subtotal)}</span>
             </div>
             <div className="flex justify-between text-xs text-slate-600">
-              <span>{isTaxActive ? `PPN (${invoice.tax_rate}%):` : invoice.tax_rate === 0 ? 'PPN (0%):' : 'Tanpa PPN:'}</span>
+              <span>{isTaxActive ? `Pajak PPh (${invoice.tax_rate}%):` : invoice.tax_rate === 0 ? 'Pajak PPh (0%):' : 'Tanpa Pajak PPh:'}</span>
               <span className="font-mono font-bold text-slate-800">{formatIDR(isTaxActive ? (invoice.tax_amount || 0) : 0)}</span>
             </div>
             <div className="border-t border-slate-300 pt-2.5 flex justify-between text-sm font-black text-indigo-900">

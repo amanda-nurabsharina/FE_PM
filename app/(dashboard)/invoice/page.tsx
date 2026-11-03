@@ -105,7 +105,7 @@ export default function InvoicePage() {
         <div>
           <h2 className="text-xl font-black text-slate-900 tracking-tight">Generator Invoice & Tagihan</h2>
           <p className="text-xs text-slate-500 font-medium">
-            Tagihan komisi affiliate & endorse dengan tarif PPN {user?.tax_rate !== undefined ? user.tax_rate : 11}%, PIC klien, dan status pembayaran.
+            Tagihan komisi affiliate & endorse dengan tarif Pajak PPh {user?.tax_rate !== undefined ? user.tax_rate : 11}%, PIC klien, dan status pembayaran.
           </p>
         </div>
 

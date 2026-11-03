@@ -58,7 +58,7 @@ export default function PaymentConfirmModal({
 
   if (!isOpen) return null;
 
-  // Read values directly from invoice if available (PPN aktif/tidak, tarif, total - Poin 9 Revisi)
+  // Read values directly from invoice if available (PPh aktif/tidak, tarif, total - Poin 9 Revisi)
   const effectiveInvoice = targetInvoice || linkedInvoice;
 
   let subtotal = 0;
@@ -167,7 +167,7 @@ export default function PaymentConfirmModal({
                   {effectiveInvoice.invoice_number}
                 </span>
                 <span className="text-[10px] font-semibold text-slate-500">
-                  • {isTaxActive ? `PPN ${taxRate}% Aktif` : 'Tanpa PPN'}
+                  • {isTaxActive ? `Pajak PPh ${taxRate}% Aktif` : 'Tanpa Pajak PPh'}
                 </span>
               </div>
             )}
@@ -180,7 +180,7 @@ export default function PaymentConfirmModal({
               <span className="font-mono font-semibold">{formatIDR(subtotal)}</span>
             </div>
             <div className="flex justify-between text-xs text-slate-300">
-              <span>{isTaxActive ? `PPN (${taxRate}%)` : taxRate === 0 ? 'PPN (0%)' : 'Tanpa PPN'}</span>
+              <span>{isTaxActive ? `Pajak PPh (${taxRate}%)` : taxRate === 0 ? 'Pajak PPh (0%)' : 'Tanpa Pajak PPh'}</span>
               <span className="font-mono font-semibold">{formatIDR(taxAmount)}</span>
             </div>
             <div className="border-t border-slate-700 pt-2 flex justify-between text-sm font-bold text-emerald-400">
