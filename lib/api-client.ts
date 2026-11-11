@@ -345,6 +345,62 @@ export const api = {
     });
   },
 
+  // Social Integration & Scraping
+  getSocialAccounts: () => request('/creator/settings/social-accounts'),
+  connectSocialBrowser: (platform: string) => request('/creator/settings/social-accounts/connect-browser', {
+    method: 'POST',
+    body: JSON.stringify({ platform }),
+  }),
+  connectSocialManual: (data: { platform: string; username: string; session_data: string }) => request('/creator/settings/social-accounts/connect-manual', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  connectSocialDirect: (data: { platform: string; username: string; niche?: string }) => request('/creator/settings/social-accounts/connect-direct', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  getRateCard: () => request('/creator/reports/rate-card'),
+  updateRateCard: (data: any) => request('/creator/reports/rate-card', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  syncSocialAccount: (id: number) => request(`/creator/settings/social-accounts/${id}/sync`, {
+    method: 'POST',
+  }),
+  disconnectSocialAccount: (id: number) => request(`/creator/settings/social-accounts/${id}`, {
+    method: 'DELETE',
+  }),
+  getSocialSummary: () => request('/creator/reports/social/summary'),
+  getSocialTimeline: (params: { platform?: string; days?: number } = {}) => {
+    const q = new URLSearchParams();
+    if (params.platform) q.set('platform', params.platform);
+    if (params.days) q.set('days', String(params.days));
+    return request(`/creator/reports/social/timeline?${q.toString()}`);
+  },
+  getSocialContents: (params: { platform?: string; limit?: number } = {}) => {
+    const q = new URLSearchParams();
+    if (params.platform) q.set('platform', params.platform);
+    if (params.limit) q.set('limit', String(params.limit));
+    return request(`/creator/reports/social/contents?${q.toString()}`);
+  },
+  exportSocialReport: async () => {
+    const token = getToken();
+    const res = await fetch(`${API_BASE_URL}/creator/reports/social/export`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    if (!res.ok) throw new Error('Gagal mengunduh laporan CSV');
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `social_report_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  },
+
   // Platform & Multi-Tenant Management (Authenticated with platform_admin_token)
   getTenants: () => adminRequest('/platform/tenants'),
   getTenantById: (id: number) => adminRequest(`/platform/tenants/${id}`),

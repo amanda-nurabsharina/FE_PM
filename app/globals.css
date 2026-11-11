@@ -67,8 +67,28 @@ body {
   #printable-report-document,
   #printable-report-document *,
   #printable-invoice-modal,
-  #printable-invoice-modal * {
+  #printable-invoice-modal *,
+  #printable-kol-pdf,
+  #printable-kol-pdf * {
     visibility: visible;
+  }
+
+  #printable-kol-pdf {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .kol-pdf-page {
+    page-break-after: always;
+    break-after: page;
+    min-height: 290mm;
+    box-sizing: border-box;
+    background: #ffffff !important;
   }
 
   #printable-report-document,

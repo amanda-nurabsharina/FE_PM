@@ -33,7 +33,7 @@ export default function DashboardLayout({
 
     if (storedUser && storedUser.role !== 'OWNER' && !storedUser.is_owner && storedUser.allowed_menus && storedUser.allowed_menus.length > 0) {
       const currentSegment = pathname.split('/')[1];
-      if (currentSegment && !storedUser.allowed_menus.includes(currentSegment)) {
+      if (currentSegment && currentSegment !== 'social' && !storedUser.allowed_menus.includes(currentSegment)) {
         const fallback = storedUser.allowed_menus[0] || 'beranda';
         router.replace(`/${fallback}`);
         return;
@@ -56,6 +56,7 @@ export default function DashboardLayout({
   const getPageTitle = (path: string) => {
     if (path.startsWith('/beranda')) return 'Dashboard Utama';
     if (path.startsWith('/tugas')) return 'Pusat Tugas';
+    if (path.startsWith('/social')) return 'Analitik Media Sosial';
     if (path.startsWith('/laporan')) return 'Laporan & Rekapitulasi';
     if (path.startsWith('/invoice')) return 'Generator Invoice';
     if (path.startsWith('/keuangan')) return 'Pencatatan Keuangan';

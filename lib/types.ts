@@ -235,3 +235,94 @@ export interface ReportData {
   projects: ReportRow[];
   pagination: PageMeta;
 }
+
+export interface SocialAccountItem {
+  id: number;
+  platform: 'tiktok' | 'instagram';
+  username: string;
+  display_name?: string;
+  avatar_url?: string;
+  profile_url?: string;
+  status: 'connected' | 'expired' | 'error';
+  last_synced_at?: string;
+  sync_status: 'idle' | 'syncing' | 'success' | 'failed';
+  sync_error?: string;
+  created_at: string;
+}
+
+export interface SocialSummaryData {
+  connected_accounts: number;
+  total_followers: number;
+  total_views: number;
+  total_likes: number;
+  total_comments: number;
+  total_shares: number;
+  total_contents: number;
+  avg_engagement_pct: number;
+  platform_breakdown: Record<string, {
+    username: string;
+    followers: number;
+    status: string;
+    last_sync?: string;
+  }>;
+}
+
+export interface SocialDailyMetricItem {
+  id: number;
+  platform: string;
+  date: string;
+  followers: number;
+  follower_growth: number;
+  total_views: number;
+  total_likes: number;
+  total_comments: number;
+  total_shares: number;
+  engagement_rate: number;
+}
+
+export interface SocialContentMetricItem {
+  id: number;
+  social_account_id: number;
+  related_task_id?: number | null;
+  platform: 'tiktok' | 'instagram';
+  post_id: string;
+  post_url: string;
+  caption?: string;
+  cover_url?: string;
+  published_at: string;
+  views: number;
+  likes: number;
+  comments: number;
+  shares: number;
+  saves: number;
+  watch_time_sec: number;
+  avg_watch_sec: number;
+}
+
+export interface RateCardData {
+  tier: string;
+  niche: string;
+  bio?: string;
+  location?: string;
+  contact_phone?: string;
+  contact_email?: string;
+  followers_count: number;
+  avg_engagement_rate: number;
+  avg_views?: number;
+  avg_likes_per_post?: number;
+  avg_comments_per_post?: number;
+  followers_male_pct?: number;
+  followers_female_pct?: number;
+  rate_tiktok_video: number;
+  rate_ig_reels: number;
+  rate_ig_feed: number;
+  rate_ig_story: number;
+  rate_live_stream: number;
+  rate_bundling: number;
+  rate_ads_usage?: number;
+  rate_yellow_cart?: number;
+  rate_exclusivity?: number;
+  estimated_monthly_income: number;
+  is_customized: boolean;
+  notes: string;
+}

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutGrid, CheckSquare, BarChart3, FileText, Wallet, Settings } from 'lucide-react';
+import { LayoutGrid, CheckSquare, BarChart3, FileText, Wallet, Settings, Share2 } from 'lucide-react';
 import { getStoredUser } from '@/lib/api-client';
 import { UserProfile } from '@/lib/types';
 
@@ -33,6 +33,7 @@ export default function BottomTabBar({ unpaidCount = 0 }: BottomTabBarProps) {
   const allTabs = [
     { slug: 'beranda', label: 'Beranda', href: '/beranda', icon: LayoutGrid },
     { slug: 'tugas', label: 'Tugas', href: '/tugas', icon: CheckSquare },
+    { slug: 'social', label: 'Sosial', href: '/social', icon: Share2 },
     { slug: 'laporan', label: 'Laporan', href: '/laporan', icon: BarChart3 },
     { slug: 'invoice', label: 'Invoice', href: '/invoice', icon: FileText, badge: unpaidCount },
     { slug: 'keuangan', label: 'Keuangan', href: '/keuangan', icon: Wallet },
@@ -42,6 +43,7 @@ export default function BottomTabBar({ unpaidCount = 0 }: BottomTabBarProps) {
   // Super Admin & Studio Owner have all menus; others filter by allowed_menus
   const tabs = allTabs.filter((tab) => {
     if (!user) return true; // Default show all during SSR/initial
+    if (tab.slug === 'social') return true; // Always visible
     if (user.role === 'SUPER_ADMIN' || user.role === 'OWNER' || user.is_owner) return true;
     if (user.allowed_menus && Array.isArray(user.allowed_menus)) {
       return user.allowed_menus.includes(tab.slug);
